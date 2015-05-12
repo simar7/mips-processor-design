@@ -11,6 +11,31 @@ output data_out[31:0];
 
 parameter depth = 1000000;
 
+
+always @(posedge clock)
+begin : WRITE
+	if (rw && !busy) begin
+		busy = 1;
+		// Write data to memory[address]
+	end
+end
+
+always @(posedge clock)
+begin : READ
+	if (!rw && !busy) begin
+		busy = 1; 
+		if (access_size > 32) begin
+			// send data onto data bus in consecutive cycles
+		end else begin
+			// send data onto data bus
+		end
+	end
+end
+
+endmodule;
+
+
+
 /* 
    // loop
    {
