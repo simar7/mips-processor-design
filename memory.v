@@ -10,29 +10,50 @@ input busy;
 input enable;
 output data_out[31:0];
 
-parameter depth = 1000000;
+parameter depth = 1048576;
+// -1 for 0 based indexed
+parameter bytes_in_word = 4-1;
+parameter bits_in_bytes = 8-1;
+parameter BYTE = 8;
 
 // Create a 1MB deep memory of 8-bits (1 byte) width
-reg [7:0] mem[depth];
-reg [7:0] data;
+reg [31:0] mem[depth];
+reg [31:0] data;
+
+reg [bits_in_bytes:0] byte[bytes_in_word:0];
 
 always @(posedge clock)
 begin : WRITE
+	// rw = 1
 	if (rw && !busy && enable) begin
 		busy = 1;
 		// Write data to memory[address]
+		mem[address] <= data_in;
 
 	end
 end
 
+/*
+  00: 1 word   (4-bytes)
+  01: 4 words  (16-bytes)
+  10: 8 words  (32-bytes)
+  11: 16 words (64-bytes)
+*/
 always @(posedge clock)
 begin : READ
 	if (!rw && !busy && enable) begin
 		busy = 1; 
-		if (access_size > 32) begin
-			// send data onto data bus in consecutive cycles
+		if (access_size == 2'b0_0 ) begin
+			// read 4 bytes at max in 1 clock cycle.
+			for (i = 0; i < access_size/8; i = i+1 ) begin
+				byte[i] <= mem[BYTE*i +: BYTE];
+			end
 		end else begin
-			// send data onto data bus
+			// send data onto data bus in consecutive cycles
+			
+
+
+				
 		end
 	end
 end
