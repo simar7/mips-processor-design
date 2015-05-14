@@ -62,8 +62,12 @@ begin : READ
 				byte[i] <= mem[global_cur_add+i];
 		
 		end else if (access_size == 2'b1_0) begin
-		
+			for (i = 0; i < 4 && cyc_ctr < 8; i = i+1) begin
+				byte[i] <= mem[global_cur_add+i];
+  		
 		end else if (access_size == 2'b1_1) begin
+			for (i = 0; i < 4 && cyc_ctr < 16; i = i+1) begin
+				byte[i] <= mem[global_cur_add+i];
 
 		end 
         global_cur_addr = global_cur_addr + 4;
