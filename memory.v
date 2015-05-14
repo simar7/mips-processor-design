@@ -25,7 +25,7 @@ output data_out[data_width-1:0];
 // Create a 1MB deep memory of 8-bits (1 byte) width
 reg [7:0] mem[depth]; // should be [7:0] since its byte addressible memory
 reg [7:0] data;
-reg [bits_in_bytes:0] word[bytes_in_word:0];
+reg [7:0] byte[3:0];
 
 always @(posedge clock)
 begin : WRITE
@@ -44,27 +44,30 @@ end
   11: 16 words (64-bytes)
 */
 
-assign data_out = {word[0], word[1], word[2], word[3]};
+// Combine 4 bytes together to send out.
+assign data_out = {byte[0], byte[1], byte[2], byte[3]};
 
 always @(posedge clock)
 begin : READ
 	if (!rw && !busy && enable) begin
 		busy = 1; 
-		if (access_size == 2'b0_0 ) begin
-			// read 4 bytes at max in 1 clock cycle.
-			for (i = 0; i < 4; i = i+1 ) begin
-				word[i] <= mem[BYTE*i +: BYTE];
+		// 00: 1 word
+        if (access_size == 2'b0_0 ) begin
+            // read 4 bytes at max in 1 clock cycle.
+			for (i = 0; i < 4; i = i+1) begin
+				byte[i] <= mem[address+i];
 			end
 		end else if (access_size == 2'b0_1) begin
-			for (i = 0; i < 4; i = i+1 ) begin
-				word[i] < mem[BYTE*i +: BYTE];
+			for (i = 0; i < 4 && cyc_ctr < 4; i = i+1) begin
+				byte[i] <= mem[global_cur_add+i];
 		
-	
 		end else if (access_size == 2'b1_0) begin
 		
 		end else if (access_size == 2'b1_1) begin
-		
+
 		end 
+        global_cur_addr = global_cur_addr + 4;
+        cyc_ctr = cyc_ctr + 1;
 	end
 	busy = 0;
 end
