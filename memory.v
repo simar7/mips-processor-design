@@ -30,14 +30,18 @@ reg [31:0] global_cur_addr;
 integer cyc_ctr = 0;
 integer i = 0;
 
+reg busy_r;
+
+assign busy = busy_r;
+
 always @(posedge clock)
 begin : WRITE
 	// rw = 1
 	if (rw && enable) begin
-		busy = 1;
+		busy_r = 1;
 		mem[address] <= data_in;
 	end
-	busy = 0;
+	busy_r = 0;
 end
 
 /*
@@ -58,7 +62,7 @@ always @(posedge clock)
 always @(posedge clock)
 begin : READ
 	if (!rw && enable) begin
-		busy = 1; 
+		busy_r = 1; 
 		// 00: 1 word
         if (access_size == 2'b0_0 ) begin
             // read 4 bytes at max in 1 clock cycle.
@@ -84,10 +88,10 @@ begin : READ
         global_cur_addr = global_cur_addr + 4;
         cyc_ctr = cyc_ctr + 1;
 	end
-	busy = 0;
+	busy_r = 0;
 end
 
-endmodule;
+endmodule
 
 
 
