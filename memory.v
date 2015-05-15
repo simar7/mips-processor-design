@@ -64,9 +64,9 @@ always @(posedge clock)
 begin : READ
 	if (!rw && enable) begin
 		busy_r = 1; 
-		// 00: 1 word
+	// 00: 1 word
         if (access_size == 2'b0_0 ) begin
-            // read 4 bytes at max in 1 clock cycle.
+        // read 4 bytes at max in 1 clock cycle.
 			for (i = 0; i < 4; i = i+1) begin
 				byte[i] <= mem[address-start_addr+i];
 			end
