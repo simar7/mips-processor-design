@@ -26,7 +26,7 @@ integer fd;
 integer scan_fd;
 integer status_read, status_write;
 integer sscanf_ret;
-reg [31:0] fd_in;
+reg [31:0] line;
 reg [31:0] str;
 
 // Instantiate the memory
@@ -43,8 +43,6 @@ memory M0 (
 
 initial begin
 
-	// FIXME: WTF (read: -2147483641) is fd when doing fopen?!
-	// FIXME: Find the right location where SumArray.x resides.
 	fd = $fopen("SumArray.x", "r");
 	if (!fd)
 		$display("Could not open");
@@ -53,21 +51,20 @@ initial begin
 	address = 0;
 	data_in = 0;
 	access_size = 0;
-	rw = 0;
 	enable = 1;
 	
+	// WRITE
+	rw = 0;
 	// Read the data from file, stored in local regs.
 	while (!$feof(fd)) begin
-		scan_fd = $fscanf(fd, "%x", fd_in);
-		$display("fd_in = %x", fd_in);
-		@(posedge clock);
-			status_read = $fscanf(fd, "%h\n", fd_in[31:16], fd_in[15:0]);
-			sscanf_ret = $sscanf(str, "%x", fd_in);
+		scan_fd = $fscanf(fd, "%x", line);
+		$display("line = %x", line);
+		data_in = line;
 	end
 	$fclose(fd);
 end
 
 always
-	#1 clock = ! clock;
+	#5 clock = !clock;
 
 endmodule 
