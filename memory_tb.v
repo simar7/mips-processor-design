@@ -27,7 +27,7 @@ integer scan_fd;
 integer status_read, status_write;
 integer sscanf_ret;
 reg [31:0] line;
-reg [31:0] str;
+reg [31:0] data_read;
 
 // Instantiate the memory
 memory M0 (
@@ -60,11 +60,20 @@ initial begin
 		scan_fd = $fscanf(fd, "%x", line);
 		$display("line = %x", line);
 		data_in = line;
+		address = address + 1;
 	end
+
+	// READ
+	rw = 1;
+	address = 0;
+	@(posedge clock)
+		data_read = data_out;
+		$display("data_read = %x", data_read);
+
 	$fclose(fd);
 end
 
 always
-	#5 clock = !clock;
+	#1 clock = !clock;
 
 endmodule 
