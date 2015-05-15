@@ -9,8 +9,8 @@ parameter depth = 1048576;
 parameter bytes_in_word = 4-1;
 parameter bits_in_bytes = 8-1;
 parameter BYTE = 8;
-parameter start_addr = 32'h80020000
-
+parameter start_addr = 32'h80020000;
+	
 // Input Ports
 input clock;
 input [address_width-1:0] address;
@@ -64,9 +64,9 @@ always @(posedge clock)
 begin : READ
 	if (!rw && enable) begin
 		busy_r = 1; 
-		// 00: 1 word
+	// 00: 1 word
         if (access_size == 2'b0_0 ) begin
-            // read 4 bytes at max in 1 clock cycle.
+        // read 4 bytes at max in 1 clock cycle.
 			for (i = 0; i < 4; i = i+1) begin
 				byte[i] <= mem[address+i];
 			end
