@@ -41,16 +41,7 @@ reg busy_r;
 
 assign busy = busy_r;
 
-initial begin
-	fd = $fopen("SumArray.x", "r");
-	$monitor("fd_in = %x", fd_in);
-	while (!$feof(fd)) begin
-		@(posedge clock);
-			status_read = $fscanf(fd, "%h\n", fd_in[31:16], fd_in[15:0]);
-			blah = $sscanf(str, "%x", fd_in);
-	end
-	$fclose(fd);
-end
+
 			
 always @(posedge clock)
 begin : WRITE
