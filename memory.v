@@ -73,7 +73,7 @@ end
 assign data_out = {byte[0], byte[1], byte[2], byte[3]};
 
 always @(posedge clock)
-    if (!busy) begin
+    if (!busy_r) begin
         global_cur_addr <= address-start_addr;
     end
 
