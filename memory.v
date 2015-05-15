@@ -40,9 +40,7 @@ reg [31:0] str;
 reg busy_r;
 
 assign busy = busy_r;
-
-
-			
+		
 always @(posedge clock)
 begin : WRITE
 	// rw = 1
@@ -60,9 +58,6 @@ end
   11: 16 words (64-bytes)
 */
 
-// Combine 4 bytes together to send out.
-assign data_out = {byte[0], byte[1], byte[2], byte[3]};
-
 always @(posedge clock)
     if (!busy_r) begin
         global_cur_addr <= address-start_addr;
@@ -75,23 +70,25 @@ begin : READ
 	// 00: 1 word
         if (access_size == 2'b0_0 ) begin
         // read 4 bytes at max in 1 clock cycle.
-			for (i = 0; i < 4; i = i+1) begin
-				byte[i] <= mem[address-start_addr+i];
-			end
+		assign data_out = {mem[address-start_addr], mem[address-start_addr+1], mem[address-start_addr+2], mem[address-start_addr+3]};
+
         // 01: 4 words
 		end else if (access_size == 2'b0_1) begin
-			for (i = 0; i < 4 && cyc_ctr < 4; i = i+1) begin
-				byte[i] <= mem[global_cur_addr+i];
+			if (cyc_ctr < 4) begin
+				assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
+			end;
 	        end
         // 10: 8 words
 		end else if (access_size == 2'b1_0) begin
-			for (i = 0; i < 4 && cyc_ctr < 8; i = i+1) begin
-				byte[i] <= mem[global_cur_addr+i];
+			if (cyc_ctr < 4) begin
+				assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
+			end;
   	        end
         // 11: 16 words
 		end else if (access_size == 2'b1_1) begin
-			for (i = 0; i < 4 && cyc_ctr < 16; i = i+1) begin
-				byte[i] <= mem[global_cur_addr+i];
+			if (cyc_ctr < 4) begin
+				assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
+			end;
 		    end
         end 
         global_cur_addr = global_cur_addr + 4;
