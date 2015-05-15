@@ -9,6 +9,7 @@ parameter depth = 1048576;
 parameter bytes_in_word = 4-1;
 parameter bits_in_bytes = 8-1;
 parameter BYTE = 8;
+parameter start_addr = 32'h80020000
 
 // Input Ports
 input clock;
@@ -39,7 +40,7 @@ begin : WRITE
 	// rw = 1
 	if (rw && enable) begin
 		busy_r = 1;
-		mem[address] <= data_in;
+		mem[address-start_addr] <= data_in;
 	end
 	busy_r = 0;
 end
@@ -92,29 +93,4 @@ begin : READ
 end
 
 endmodule
-
-
-
-/* 
-   // loop
-   {
-     if rw == 1:
-	asrt busy -> 1
-	// do read logic 
-	// we get address
- 	if address == 32 bits
-		if access_size > 32 bits
-			cycles - each 4 bytes wide
-		else
-			send 4 bytes of data on data bus
-     else // rw = 0
-	asrt busy -> 1
-	// do write logic
-	// we get address and data_in
-
-     // at the end of the loop de-assrt busy
-     asrt busy -> 0
-   }
-*/
-
 	
