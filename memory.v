@@ -33,11 +33,11 @@ integer i = 0;
 always @(posedge clock)
 begin : WRITE
 	// rw = 1
-	if (rw && !busy && enable) begin
-		assign busy = 1;
+	if (rw && enable) begin
+		busy = 1;
 		mem[address] <= data_in;
 	end
-	assign busy = 0;
+	busy = 0;
 end
 
 /*
@@ -57,7 +57,7 @@ always @(posedge clock)
 
 always @(posedge clock)
 begin : READ
-	if (!rw && !busy && enable) begin
+	if (!rw && enable) begin
 		busy = 1; 
 		// 00: 1 word
         if (access_size == 2'b0_0 ) begin
