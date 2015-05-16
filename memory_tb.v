@@ -55,25 +55,28 @@ initial begin
 	
 	// WRITE
 	rw = 0;
+
+//	// READ
+//	rw = 1;
+//	address = 0;
+//	@(posedge clock)
+//		data_read = data_out;
+//		$display("data_read = %x", data_read);
+//
+//	$fclose(fd);
+end
+
+always
 	// Read the data from file, stored in local regs.
 	while (!$feof(fd)) begin
 		scan_fd = $fscanf(fd, "%x", line);
 		$display("line = %x", line);
+		@ (posedge clock);
 		data_in = line;
 		address = address + 1;
 	end
 
-	// READ
-	rw = 1;
-	address = 0;
-	@(posedge clock)
-		data_read = data_out;
-		$display("data_read = %x", data_read);
-
-	$fclose(fd);
-end
-
 always
-	#1 clock = !clock;
+	#1 clock = ! clock;
 
 endmodule 

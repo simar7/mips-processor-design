@@ -20,8 +20,8 @@ input rw;
 input enable;
 
 // Output Ports
-output busy;
-output [data_width-1:0] data_out;
+output reg busy;
+output reg [data_width-1:0] data_out;
 
 // Create a 1MB deep memory of 8-bits (1 byte) width
 reg [7:0] mem[0:depth]; // should be [7:0] since its byte addressible memory
@@ -39,16 +39,16 @@ reg [31:0] str;
 
 reg busy_r;
 
-assign busy = busy_r;
-		
 always @(posedge clock)
 begin : WRITE
 	// rw = 1
-	if (rw && enable) begin
-		busy_r = 1;
-		mem[address-start_addr] <= data_in;
+	if (!rw && enable) begin
+		busy_r = 1'h1;
+		assign busy = busy_r;
+		mem[address] = data_in;
 	end
-	busy_r = 0;
+	busy_r = 1'h0;
+	assign busy = busy_r;
 end
 
 /*
@@ -60,41 +60,41 @@ end
 
 always @(posedge clock)
     if (!busy_r) begin
-        global_cur_addr <= address-start_addr;
+        global_cur_addr <= start_addr-address;
     end
 
 always @(posedge clock)
 begin : READ
-	if (!rw && enable) begin
-		busy_r = 1; 
-	// 00: 1 word
-        if (access_size == 2'b0_0 ) begin
-        // read 4 bytes at max in 1 clock cycle.
-		assign data_out = {mem[address-start_addr], mem[address-start_addr+1], mem[address-start_addr+2], mem[address-start_addr+3]};
+	if (rw && enable) begin
+		busy_r = 1'h1; 
+		assign busy = busy_r;
+	
+		// 00: 1 word
+        	if (access_size == 2'b0_0 ) begin
+        		// read 4 bytes at max in 1 clock cycle.
+			assign data_out = {mem[address-start_addr], mem[address-start_addr+1], mem[address-start_addr+2], mem[address-start_addr+3]};
 
-        // 01: 4 words
+       		// 01: 4 words
 		end else if (access_size == 2'b0_1) begin
 			if (cyc_ctr < 4) begin
 				assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
-			end;
-	        end
-        // 10: 8 words
+			end
+        	// 10: 8 words
 		end else if (access_size == 2'b1_0) begin
 			if (cyc_ctr < 4) begin
 				assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
-			end;
-  	        end
-        // 11: 16 words
+			end
+        	// 11: 16 words
 		end else if (access_size == 2'b1_1) begin
 			if (cyc_ctr < 4) begin
 				assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
-			end;
-		    end
+			end
+		end
+        global_cur_addr = global_cur_addr + 4'h4;
+        cyc_ctr = cyc_ctr + 1'h1;
         end 
-        global_cur_addr = global_cur_addr + 4;
-        cyc_ctr = cyc_ctr + 1;
-	end
-	busy_r = 0;
+	busy_r = 1'h0;
+	assign busy = busy_r;
 end
 
 endmodule
