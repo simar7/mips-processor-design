@@ -48,13 +48,14 @@ initial begin
 		$display("Could not open");
 
 	clock = 0;
-	address = 0;
+	address = start_addr;
 	data_in = 0;
 	access_size = 0;
 	enable = 1;
+	rw = 0;		// Start writing first.
 	
 	// WRITE
-	rw = 0;
+	//rw = 0;
 
 //	// READ
 //	rw = 1;
@@ -67,14 +68,24 @@ initial begin
 end
 
 always
-	// Read the data from file, stored in local regs.
-	while (!$feof(fd)) begin
+	// WRITE
+	if (!$feof(fd) && rw == 0) begin : MEM_WRITE
+		//rw = 0;
 		scan_fd = $fscanf(fd, "%x", line);
 		$display("line = %x", line);
-		@ (posedge clock);
 		data_in = line;
 		address = address + 4;
+		@ (posedge clock);
 	end
+	else begin : MEM_READ
+		// done writing, now read...
+		rw = 1;
+		data_read = data_out;
+		$display("data_read = %x", data_read);
+		address = address + 1;
+		@ (posedge clock);
+	end
+
 
 always
 	#1 clock = ! clock;
