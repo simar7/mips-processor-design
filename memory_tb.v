@@ -73,7 +73,7 @@ always
 		$display("line = %x", line);
 		@ (posedge clock);
 		data_in = line;
-		address = address + 1;
+		address = address + 4;
 	end
 
 always

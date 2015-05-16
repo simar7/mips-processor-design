@@ -45,7 +45,10 @@ begin : WRITE
 	if (!rw && enable) begin
 		busy_r = 1'h1;
 		assign busy = busy_r;
-		mem[address] = data_in;
+		mem[address] <= data_in[7:0];
+		mem[address+1] <= data_in[15:8];
+		mem[address+2] <= data_in[23:16];
+		mem[address+3] <= data_in[31:24];	
 	end
 	busy_r = 1'h0;
 	assign busy = busy_r;
