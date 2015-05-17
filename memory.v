@@ -39,7 +39,7 @@ reg [31:0] str;
 
 reg busy_r;
 
-always @(posedge clock)
+always @(clock)
 begin : WRITE
 	// rw = 1
 	if (!rw && enable) begin
