@@ -39,14 +39,11 @@ integer blah;
 reg [31:0] fd_in;
 reg [31:0] str;
 
-reg busy_r;
-
 always @(posedge clock, data_in, rw)
 begin : WRITE
 	// rw = 1
 	if (!rw && enable) begin
-		busy_r = 1;
-		assign busy = busy_r;
+		busy <= 1;
 		// 00: 1 word
         	if (access_size == 2'b0_0 ) begin
 			mem[address-start_addr+3] <= data_in[7:0];
@@ -66,8 +63,7 @@ begin : WRITE
 		global_cur_addr_write <= global_cur_addr_write + 4;
 		cyc_ctr_write = cyc_ctr_write + 1;		
 	end
-	busy_r = 0;
-	assign busy = busy_r;
+	busy <= 0;
 end
 
 /*
@@ -85,9 +81,8 @@ always @(posedge clock)
 
 always @(posedge clock, address, rw)
 begin : READ
-	if (rw && enable) begin
-		busy_r = 1'h1; 
-		assign busy = busy_r;
+	if (rw && enable) begin 
+		busy <= 1;
 
 		// 00: 1 word
         	if (access_size == 2'b0_0 ) begin
@@ -102,24 +97,23 @@ begin : READ
        		// 01: 4 words
 		end else if (access_size == 2'b0_1) begin
 			if (cyc_ctr < 4) begin
-				assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
+				//assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
 			end
         	// 10: 8 words
 		end else if (access_size == 2'b1_0) begin
 			if (cyc_ctr < 4) begin
-				assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
+				//assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
 			end
         	// 11: 16 words
 		end else if (access_size == 2'b1_1) begin
 			if (cyc_ctr < 4) begin
-				assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
+				//assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
 			end
 		end
         global_cur_addr = global_cur_addr + 4'h4;
         cyc_ctr = cyc_ctr + 1'h1;
         end 
-	busy_r = 1'h0;
-	assign busy = busy_r;
+	busy <= 0;
 end
 
 endmodule
