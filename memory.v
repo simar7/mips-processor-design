@@ -1,6 +1,6 @@
 // ECE 429
 //FIXME: include output port busy
-module memory(clock, address, data_in, access_size, rw, enable, data_out);
+module memory(clock, address, data_in, access_size, rw, enable, busy, data_out);
 
 parameter data_width = 32;
 parameter address_width = 32;
@@ -22,7 +22,7 @@ input enable;
 
 // Output Ports
 //FIXME: change to output port.
-reg busy;
+output reg busy;
 output reg [data_width-1:0] data_out;
 
 // Create a 1MB deep memory of 8-bits (1 byte) width
@@ -48,9 +48,12 @@ always @(posedge clock, data_in, rw)
 begin : WRITE
 	// rw = 1
 	if ((!rw && enable)) begin
+		// busy is to be asserted in case of burst transactions.
 		if(total_words > 1) begin
 			busy = 1;
 		end
+		// this will give busy an initial value.
+		// Note: This would also be set for burst transactions (which is fine).
 		else begin
 			busy = 0;
 		end
@@ -64,15 +67,8 @@ begin : WRITE
 		// 01: 4 words
 		else if (access_size == 2'b0_1) begin
 			total_words = 4;
+			// skip over the already written bytes
 			global_cur_addr_write = address-start_addr;
-			// state when no cycles or current burst.
-			/*if (words_written == 0 && busy == 0) begin
-				global_cur_addr_write = address-start_addr;
-			end
-			else if (words_written < total_words) begin
-				global_cur_addr_write = address-start_addr;
-			end
-			*/
 			if (words_written < 4) begin
 				busy = 1;
 				mem[global_cur_addr_write+3] <= data_in[7:0];
@@ -81,6 +77,7 @@ begin : WRITE
 				mem[global_cur_addr_write] <= data_in[31:24];
 				words_written <= words_written + 1;
 			end
+			// reset stuff when all words in the access_size window are written.
 			else begin
 				busy = 0;
 				words_written <= 0;

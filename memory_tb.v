@@ -40,7 +40,7 @@ memory M0 (
 	.access_size (access_size),
 	.rw (rw),
 	.enable (enable),
-	//.busy (busy),
+	.busy (busy),
 	.data_out (data_out)
 );
 
