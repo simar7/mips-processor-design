@@ -89,9 +89,9 @@ always
 		if (words_read == 0) begin
 			address = 32'h80020000;
 		end
+		@(posedge clock);
 		data_read = data_out;
 		$display("data_read = %x", data_read);
-		@(posedge clock);
 		address = address + 4;
 		words_read = words_read + 1;
 		

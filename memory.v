@@ -39,7 +39,7 @@ reg [31:0] str;
 
 reg busy_r;
 
-always @(posedge clock)
+always @(posedge clock, data_in, rw)
 begin : WRITE
 	// rw = 1
 	if (!rw && enable) begin
@@ -66,7 +66,7 @@ always @(posedge clock)
         global_cur_addr <= start_addr-address;
     end
 
-always @(posedge clock)
+always @(posedge clock, address, rw)
 begin : READ
 	if (rw && enable) begin
 		busy_r = 1'h1; 
