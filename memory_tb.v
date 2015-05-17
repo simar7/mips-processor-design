@@ -66,7 +66,6 @@ always 	@(posedge clock) begin
 		enable = 1;
 		//rw = 0;
 		scan_fd = $fscanf(fd, "%x", line);
-		//@(posedge clock);
 		if (!$feof(fd)) begin
 			data_in = line;
 			$display("line = %x", data_in);
@@ -83,11 +82,7 @@ always 	@(posedge clock) begin
 		// done writing, now read...
 		rw = 1;
 		enable = 1;
-		//if (words_read == 0) begin
-			//address = 32'h80020000;
-		//end
 		data_read = data_out;
-		@(posedge clock);
 		$display("data_read = %x", data_read);
 		address = address + 4;
 		words_read = words_read + 1;
