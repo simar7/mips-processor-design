@@ -60,26 +60,33 @@ initial begin
 	words_written = 0;
 end
 
-always 	
-	if (!$feof(fd) && rw == 0) begin
+always 	@(posedge clock) begin
+	if (rw == 0) begin
 		enable = 1;
-		rw = 0;
+		//rw = 0;
 		scan_fd = $fscanf(fd, "%x", line);
-		$display("line = %x", line);
-		data_in = line;
-		@(posedge clock);
-		address = address + 4;
-		words_written = words_written + 1;
+		//@(posedge clock);
+		if (!$feof(fd)) begin
+			$display("line = %x", line);
+			data_in = line;
+			address = address + 4;
+			words_written = words_written + 1;	
+		end
+		else begin
+			rw = 1;
+			address = 32'h80020000;
+		end
+
 	end
 	else if ($feof(fd) && (words_read < words_written)) begin
 		// done writing, now read...
 		rw = 1;
 		enable = 1;
-		if (words_read == 0) begin
-			address = 32'h80020000;
-		end
-		@(posedge clock);
+		//if (words_read == 0) begin
+			//address = 32'h80020000;
+		//end
 		data_read = data_out;
+		@(posedge clock);
 		$display("data_read = %x", data_read);
 		address = address + 4;
 		words_read = words_read + 1;
@@ -112,7 +119,9 @@ always
 	end
 	*/
 
+end
+
 always
-	#1 clock = ! clock;
+	#5 clock = ! clock;
 
 endmodule 
