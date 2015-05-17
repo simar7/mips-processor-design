@@ -1,5 +1,6 @@
 // ECE 429
-module memory(clock, address, data_in, access_size, rw, busy, enable, data_out);
+//FIXME: include output port busy
+module memory(clock, address, data_in, access_size, rw, enable, data_out);
 
 parameter data_width = 32;
 parameter address_width = 32;
@@ -20,7 +21,8 @@ input rw;
 input enable;
 
 // Output Ports
-output reg busy;
+//FIXME: change to output port.
+reg busy;
 output reg [data_width-1:0] data_out;
 
 // Create a 1MB deep memory of 8-bits (1 byte) width
@@ -32,6 +34,9 @@ reg [31:0] global_cur_addr_write;
 integer cyc_ctr = 0;
 integer cyc_ctr_write = 0;
 integer i = 0;
+integer words_written = 0;
+integer words_read = 0;
+integer total_words = 0;
 
 integer fd;
 integer status_read, status_write;
@@ -42,8 +47,13 @@ reg [31:0] str;
 always @(posedge clock, data_in, rw)
 begin : WRITE
 	// rw = 1
-	if (!rw && enable) begin
-		busy <= 1;
+	if ((!rw && enable)) begin
+		if(total_words > 1) begin
+			busy = 1;
+		end
+		else begin
+			busy = 0;
+		end
 		// 00: 1 word
         	if (access_size == 2'b0_0 ) begin
 			mem[address-start_addr+3] <= data_in[7:0];
@@ -53,17 +63,30 @@ begin : WRITE
 		end
 		// 01: 4 words
 		else if (access_size == 2'b0_1) begin
-			if (cyc_ctr_write < 4) begin
+			total_words = 4;
+			global_cur_addr_write = address-start_addr;
+			// state when no cycles or current burst.
+			/*if (words_written == 0 && busy == 0) begin
+				global_cur_addr_write = address-start_addr;
+			end
+			else if (words_written < total_words) begin
+				global_cur_addr_write = address-start_addr;
+			end
+			*/
+			if (words_written < 4) begin
+				busy = 1;
 				mem[global_cur_addr_write+3] <= data_in[7:0];
 				mem[global_cur_addr_write+2] <= data_in[15:8];
 				mem[global_cur_addr_write+1] <= data_in[23:16];
-				mem[global_cur_addr_write] <= data_in[31:24];	
+				mem[global_cur_addr_write] <= data_in[31:24];
+				words_written <= words_written + 1;
+			end
+			else begin
+				busy = 0;
+				words_written <= 0;
 			end
 		end
-		global_cur_addr_write <= global_cur_addr_write + 4;
-		cyc_ctr_write = cyc_ctr_write + 1;		
 	end
-	busy <= 0;
 end
 
 /*
@@ -73,22 +96,13 @@ end
   11: 16 words (64-bytes)
 */
 
-always @(posedge clock)
-    if (!busy_r) begin
-        global_cur_addr <= start_addr-address;
-	global_cur_addr_write <= start_addr-address;
-    end
-
 always @(posedge clock, address, rw)
 begin : READ
-	if (rw && enable) begin 
-		busy <= 1;
-
+	if ((rw && enable)) begin 
 		// 00: 1 word
         	if (access_size == 2'b0_0 ) begin
         		// read 4 bytes at max in 1 clock cycle.
 			//assign data_out = {mem[address-start_addr], mem[address-start_addr+1], mem[address-start_addr+2], mem[address-start_addr+3]};
-			
 			data_out[7:0] <= mem[address-start_addr+3];
 			data_out[15:8] <= mem[address-start_addr+2];
 			data_out[23:16] <= mem[address-start_addr+1];
@@ -98,6 +112,11 @@ begin : READ
 		end else if (access_size == 2'b0_1) begin
 			if (cyc_ctr < 4) begin
 				//assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
+				busy <= 1;
+				data_out[7:0] <= mem[global_cur_addr+3];
+				data_out[15:8] <= mem[global_cur_addr+2];
+				data_out[23:16] <= mem[global_cur_addr+1];
+				data_out[31:24] <= mem[global_cur_addr];
 			end
         	// 10: 8 words
 		end else if (access_size == 2'b1_0) begin
@@ -110,10 +129,9 @@ begin : READ
 				//assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
 			end
 		end
-        global_cur_addr = global_cur_addr + 4'h4;
-        cyc_ctr = cyc_ctr + 1'h1;
+        global_cur_addr = global_cur_addr + 4;
+        cyc_ctr = cyc_ctr + 1;
         end 
-	busy <= 0;
 end
 
 endmodule
