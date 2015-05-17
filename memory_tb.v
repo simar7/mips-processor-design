@@ -31,6 +31,7 @@ integer words_written;
 reg [31:0] line;
 reg [31:0] data_read;
 
+
 // Instantiate the memory
 memory M0 (
 	.clock (clock),
@@ -57,21 +58,9 @@ initial begin
 	rw = 0;		// Start writing first.
 	words_read = 0;
 	words_written = 0;
-	
-	// WRITE
-	//rw = 0;
-
-//	// READ
-//	rw = 1;
-//	address = 0;
-//	@(posedge clock)
-//		data_read = data_out;
-//		$display("data_read = %x", data_read);
-//
-//	$fclose(fd);
 end
 
-always
+always 	
 	if (!$feof(fd) && rw == 0) begin
 		enable = 1;
 		rw = 0;
@@ -102,6 +91,7 @@ always
 		rw = 0;	// can write now.
 		@(posedge clock);
 	end
+	
 	
 	/* old logic.
 	// WRITE
