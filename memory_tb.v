@@ -1,4 +1,4 @@
-module memory_tb ();
+module memory_tb;
 
 // Constants
 parameter data_width = 32;
@@ -18,7 +18,7 @@ reg rw;
 reg enable;
 
 // Output Ports
-wire [1:0] busy;
+wire busy;
 wire [data_width-1:0] data_out;
 
 // fileIO stuff
@@ -30,6 +30,18 @@ integer words_read;
 integer words_written;
 reg [31:0] line;
 reg [31:0] data_read;
+
+// Instantiate the memory
+memory M0 (
+	.clock (clock),
+	.address (address),
+	.data_in (data_in),
+	.access_size (access_size),
+	.rw (rw),
+	.enable (enable),
+	.busy (busy),
+	.data_out (data_out)
+);
 
 initial begin
 
@@ -45,7 +57,7 @@ initial begin
 	rw = 0;		// Start writing first.
 	words_read = 0;
 	words_written = 0;
-
+	
 	// WRITE
 	//rw = 0;
 
@@ -60,8 +72,6 @@ initial begin
 end
 
 always
-begin: MEM_WRITE
-	// WRITE
 	if (!$feof(fd) && rw == 0) begin
 		enable = 1;
 		rw = 0;
@@ -71,19 +81,8 @@ begin: MEM_WRITE
 		@(posedge clock);
 		address = address + 4;
 		words_written = words_written + 1;
-		//@(posedge clock);
 	end
-	if (rw == 1 || $feof(fd)) begin
-		enable = 0;
-		rw = 1;	// can read now.
-		@(posedge clock);
-	end
-
-end
-
-always
-begin: MEM_READ
-	if (rw == 1 && (words_read < words_written)) begin
+	else if ($feof(fd) && (words_read < words_written)) begin
 		// done writing, now read...
 		rw = 1;
 		enable = 1;
@@ -92,32 +91,38 @@ begin: MEM_READ
 		end
 		data_read = data_out;
 		$display("data_read = %x", data_read);
+		@(posedge clock);
 		address = address + 4;
 		words_read = words_read + 1;
-		@(posedge clock);
+		
 	end
-	if (rw == 0 || (words_read >= words_written)) begin
+	else if (rw == 0 || (words_read >= words_written)) begin
 		// TODO: Add logic to end simulation.
 		enable = 0;
 		rw = 0;	// can write now.
 		@(posedge clock);
 	end
-end
+	
+	/* old logic.
+	// WRITE
+	if (!$feof(fd) && rw == 0) begin : MEM_WRITE
+		scan_fd = $fscanf(fd, "%x", line);
+		$display("line = %x", line);
+		data_in = line;
+		@ (posedge clock);
+		address = address + 4;
+	end
+	else begin : MEM_READ
+		// done writing, now read...
+		rw = 1;
+		data_read = data_out;
+		$display("data_read = %x", data_read);
+		address = address + 1;
+		@ (posedge clock);
+	end
+	*/
 
 always
 	#1 clock = ! clock;
-
-// Instantiate the memory
-memory M0 (
-	.clock (clock),
-	.address (address),
-	.data_in (data_in),
-	.access_size (access_size),
-	.rw (rw),
-	.enable (enable),
-	.busy (busy),
-	.data_out (data_out)
-);
-
 
 endmodule 
