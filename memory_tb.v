@@ -54,7 +54,7 @@ initial begin
 	address = start_addr;
 	scan_fd = $fscanf(fd, "%x", data_in);
 	//data_in = 0;
-	access_size = 0;
+	access_size = 2'b0_1;
 	enable = 1;
 	rw = 0;		// Start writing first.
 	words_read = 0;

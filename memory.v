@@ -28,7 +28,9 @@ reg [7:0] mem[0:depth]; // should be [7:0] since its byte addressible memory
 reg [7:0] data;
 reg [7:0] byte[3:0];
 reg [31:0] global_cur_addr;
+reg [31:0] global_cur_addr_write;
 integer cyc_ctr = 0;
+integer cyc_ctr_write = 0;
 integer i = 0;
 
 integer fd;
@@ -45,10 +47,24 @@ begin : WRITE
 	if (!rw && enable) begin
 		busy_r = 1;
 		assign busy = busy_r;
-		mem[address-start_addr+3] <= data_in[7:0];
-		mem[address-start_addr+2] <= data_in[15:8];
-		mem[address-start_addr+1] <= data_in[23:16];
-		mem[address-start_addr] <= data_in[31:24];	
+		// 00: 1 word
+        	if (access_size == 2'b0_0 ) begin
+			mem[address-start_addr+3] <= data_in[7:0];
+			mem[address-start_addr+2] <= data_in[15:8];
+			mem[address-start_addr+1] <= data_in[23:16];
+			mem[address-start_addr] <= data_in[31:24];	
+		end
+		// 01: 4 words
+		else if (access_size == 2'b0_1) begin
+			if (cyc_ctr_write < 4) begin
+				mem[global_cur_addr_write+3] <= data_in[7:0];
+				mem[global_cur_addr_write+2] <= data_in[15:8];
+				mem[global_cur_addr_write+1] <= data_in[23:16];
+				mem[global_cur_addr_write] <= data_in[31:24];	
+			end
+		end
+		global_cur_addr_write <= global_cur_addr_write + 4;
+		cyc_ctr_write = cyc_ctr_write + 1;		
 	end
 	busy_r = 0;
 	assign busy = busy_r;
@@ -64,6 +80,7 @@ end
 always @(posedge clock)
     if (!busy_r) begin
         global_cur_addr <= start_addr-address;
+	global_cur_addr_write <= start_addr-address;
     end
 
 always @(posedge clock, address, rw)
