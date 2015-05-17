@@ -52,12 +52,13 @@ initial begin
 
 	clock = 0;
 	address = start_addr;
-	data_in = 0;
+	scan_fd = $fscanf(fd, "%x", data_in);
+	//data_in = 0;
 	access_size = 0;
 	enable = 1;
 	rw = 0;		// Start writing first.
 	words_read = 0;
-	words_written = 0;
+	words_written = 1;
 end
 
 always 	@(posedge clock) begin
@@ -67,8 +68,8 @@ always 	@(posedge clock) begin
 		scan_fd = $fscanf(fd, "%x", line);
 		//@(posedge clock);
 		if (!$feof(fd)) begin
-			$display("line = %x", line);
 			data_in = line;
+			$display("line = %x", data_in);
 			address = address + 4;
 			words_written = words_written + 1;	
 		end
@@ -98,26 +99,6 @@ always 	@(posedge clock) begin
 		rw = 0;	// can write now.
 		@(posedge clock);
 	end
-	
-	
-	/* old logic.
-	// WRITE
-	if (!$feof(fd) && rw == 0) begin : MEM_WRITE
-		scan_fd = $fscanf(fd, "%x", line);
-		$display("line = %x", line);
-		data_in = line;
-		@ (posedge clock);
-		address = address + 4;
-	end
-	else begin : MEM_READ
-		// done writing, now read...
-		rw = 1;
-		data_read = data_out;
-		$display("data_read = %x", data_read);
-		address = address + 1;
-		@ (posedge clock);
-	end
-	*/
 
 end
 
