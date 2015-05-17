@@ -45,10 +45,10 @@ begin : WRITE
 	if (!rw && enable) begin
 		busy_r = 1;
 		assign busy = busy_r;
-		mem[address-start_addr] <= data_in[7:0];
-		mem[address-start_addr+1] <= data_in[15:8];
-		mem[address-start_addr+2] <= data_in[23:16];
-		mem[address-start_addr+3] <= data_in[31:24];	
+		mem[address-start_addr+3] <= data_in[7:0];
+		mem[address-start_addr+2] <= data_in[15:8];
+		mem[address-start_addr+1] <= data_in[23:16];
+		mem[address-start_addr] <= data_in[31:24];	
 	end
 	busy_r = 0;
 	assign busy = busy_r;
@@ -77,10 +77,10 @@ begin : READ
         		// read 4 bytes at max in 1 clock cycle.
 			//assign data_out = {mem[address-start_addr], mem[address-start_addr+1], mem[address-start_addr+2], mem[address-start_addr+3]};
 			
-			data_out[7:0] <= mem[address-start_addr];
-			data_out[15:8] <= mem[address-start_addr+1];
-			data_out[23:16] <= mem[address-start_addr+2];
-			data_out[31:24] <= mem[address-start_addr+3];
+			data_out[7:0] <= mem[address-start_addr+3];
+			data_out[15:8] <= mem[address-start_addr+2];
+			data_out[23:16] <= mem[address-start_addr+1];
+			data_out[31:24] <= mem[address-start_addr];
 
        		// 01: 4 words
 		end else if (access_size == 2'b0_1) begin
