@@ -172,13 +172,40 @@ begin : READ
 
         	// 10: 8 words
 		else if (access_size == 2'b1_0) begin
-			if (cyc_ctr < 8) begin
-				//assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
+			read_total_words = 8;
+			// skip over the already written bytes
+			global_cur_addr_read = address-start_addr;
+			if (words_read < 8) begin
+				busy = 1;
+				data_out[7:0] <= mem[global_cur_addr_read+3];
+				data_out[15:8] <= mem[global_cur_addr_read+2];
+				data_out[23:16] <= mem[global_cur_addr_read+1];
+				data_out[31:24] <= mem[global_cur_addr_read];
+				words_read <= words_read + 1;
 			end
+			// reset stuff when all words in the access_size window are written.
+			else begin
+				busy = 0;
+				words_read <= 0;
+			end
+
         	// 11: 16 words
 		end else if (access_size == 2'b1_1) begin
-			if (cyc_ctr < 16) begin
-				//assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
+			read_total_words = 16;
+			// skip over the already written bytes
+			global_cur_addr_read = address-start_addr;
+			if (words_read < 16) begin
+				busy = 1;
+				data_out[7:0] <= mem[global_cur_addr_read+3];
+				data_out[15:8] <= mem[global_cur_addr_read+2];
+				data_out[23:16] <= mem[global_cur_addr_read+1];
+				data_out[31:24] <= mem[global_cur_addr_read];
+				words_read <= words_read + 1;
+			end
+			// reset stuff when all words in the access_size window are written.
+			else begin
+				busy = 0;
+				words_read <= 0;
 			end
 		end
         end 
