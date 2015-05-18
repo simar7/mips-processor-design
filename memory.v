@@ -83,6 +83,40 @@ begin : WRITE
 				words_written <= 0;
 			end
 		end
+		// 10: 8 words
+		else if (access_size == 2'b1_0) begin
+			total_words = 8;
+			global_cur_addr_write = address-start_addr;
+			if (words_written < 8) begin
+				busy = 1;
+				mem[global_cur_addr_write+3] <= data_in[7:0];
+				mem[global_cur_addr_write+2] <= data_in[15:8];
+				mem[global_cur_addr_write+1] <= data_in[23:16];
+				mem[global_cur_addr_write] <= data_in[31:24];
+				words_written <= words_written + 1;
+			end
+			else begin
+				busy = 0;
+				words_written <= 0;
+			end
+		end
+		// 11: 16 words
+		else if (access_size == 2'b1_1) begin
+			total_words = 16;
+			if (words_written < 16) begin
+				busy = 1;
+				mem[global_cur_addr_write+3] <= data_in[7:0];
+				mem[global_cur_addr_write+2] <= data_in[15:8];
+				mem[global_cur_addr_write+1] <= data_in[23:16];
+				mem[global_cur_addr_write] <= data_in[31:24];
+				words_written <= words_written + 1;
+			end
+			else begin
+				busy = 0;
+				words_written <= 0;
+			end
+		end
+			
 	end
 end
 
