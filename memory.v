@@ -31,12 +31,14 @@ reg [7:0] data;
 reg [7:0] byte[3:0];
 reg [31:0] global_cur_addr;
 reg [31:0] global_cur_addr_write;
+reg [31:0] global_cur_addr_read;
 integer cyc_ctr = 0;
 integer cyc_ctr_write = 0;
 integer i = 0;
 integer words_written = 0;
 integer words_read = 0;
-integer total_words = 0;
+integer write_total_words = 0;
+integer read_total_words = 0;
 
 integer fd;
 integer status_read, status_write;
@@ -49,7 +51,7 @@ begin : WRITE
 	// rw = 1
 	if ((!rw && enable)) begin
 		// busy is to be asserted in case of burst transactions.
-		if(total_words > 1) begin
+		if(write_total_words > 1) begin
 			busy = 1;
 		end
 		// this will give busy an initial value.
@@ -66,7 +68,7 @@ begin : WRITE
 		end
 		// 01: 4 words
 		else if (access_size == 2'b0_1) begin
-			total_words = 4;
+			write_total_words = 4;
 			// skip over the already written bytes
 			global_cur_addr_write = address-start_addr;
 			if (words_written < 4) begin
@@ -96,6 +98,15 @@ end
 always @(posedge clock, address, rw)
 begin : READ
 	if ((rw && enable)) begin 
+		// busy is to be asserted in case of burst transactions.
+		if(read_total_words > 1) begin
+			busy = 1;
+		end
+		// this will give busy an initial value.
+		// Note: This would also be set for burst transactions (which is fine).
+		else begin
+			busy = 0;
+		end
 		// 00: 1 word
         	if (access_size == 2'b0_0 ) begin
         		// read 4 bytes at max in 1 clock cycle.
@@ -104,30 +115,38 @@ begin : READ
 			data_out[15:8] <= mem[address-start_addr+2];
 			data_out[23:16] <= mem[address-start_addr+1];
 			data_out[31:24] <= mem[address-start_addr];
-
-       		// 01: 4 words
-		end else if (access_size == 2'b0_1) begin
-			if (cyc_ctr < 4) begin
-				//assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
-				busy <= 1;
-				data_out[7:0] <= mem[global_cur_addr+3];
-				data_out[15:8] <= mem[global_cur_addr+2];
-				data_out[23:16] <= mem[global_cur_addr+1];
-				data_out[31:24] <= mem[global_cur_addr];
+		end
+		// 01: 4 words
+		else if (access_size == 2'b0_1) begin
+			read_total_words = 4;
+			// skip over the already written bytes
+			global_cur_addr_read = address-start_addr;
+			if (words_read < 4) begin
+				busy = 1;
+				data_out[7:0] <= mem[global_cur_addr_read+3];
+				data_out[15:8] <= mem[global_cur_addr_read+2];
+				data_out[23:16] <= mem[global_cur_addr_read+1];
+				data_out[31:24] <= mem[global_cur_addr_read];
+				words_read <= words_read + 1;
 			end
+			// reset stuff when all words in the access_size window are written.
+			else begin
+				busy = 0;
+				words_read <= 0;
+			end
+		end
+
         	// 10: 8 words
-		end else if (access_size == 2'b1_0) begin
-			if (cyc_ctr < 4) begin
+		else if (access_size == 2'b1_0) begin
+			if (cyc_ctr < 8) begin
 				//assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
 			end
         	// 11: 16 words
 		end else if (access_size == 2'b1_1) begin
-			if (cyc_ctr < 4) begin
+			if (cyc_ctr < 16) begin
 				//assign data_out = {mem[global_cur_addr], mem[global_cur_addr+1], mem[global_cur_addr+2], mem[global_cur_addr+3]};
 			end
 		end
-        global_cur_addr = global_cur_addr + 4;
-        cyc_ctr = cyc_ctr + 1;
         end 
 end
 
