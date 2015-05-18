@@ -81,13 +81,13 @@ begin : WRITE
 			end
 			// reset stuff when all words in the access_size window are written.
 			else begin
-				busy = 0;
+				//busy = 0;
 				words_written <= 0;
 			end
 		end
 		// 10: 8 words
 		else if (access_size == 2'b1_0) begin
-			total_words = 8;
+			write_total_words = 8;
 			global_cur_addr_write = address-start_addr;
 			if (words_written < 8) begin
 				busy = 1;
@@ -104,7 +104,7 @@ begin : WRITE
 		end
 		// 11: 16 words
 		else if (access_size == 2'b1_1) begin
-			total_words = 16;
+			write_total_words = 16;
 			if (words_written < 16) begin
 				busy = 1;
 				mem[global_cur_addr_write+3] <= data_in[7:0];
@@ -165,7 +165,7 @@ begin : READ
 			end
 			// reset stuff when all words in the access_size window are written.
 			else begin
-				busy = 0;
+				//busy = 0;
 				words_read <= 0;
 			end
 		end
