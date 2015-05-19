@@ -113,6 +113,7 @@ begin : WRITE
 		// 11: 16 words
 		else if (access_size == 2'b1_1) begin
 			write_total_words = 16;
+			global_cur_addr_write = address-start_addr;
 			if (words_written < 16) begin
 				if (words_written < write_total_words - 1) begin
 					busy = 1;

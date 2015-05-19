@@ -43,7 +43,13 @@ memory M0 (
 	.busy (busy),
 	.data_out (data_out)
 );
-
+/*
+  Mapping for access size:
+  00: 1 word   (4-bytes)
+  01: 4 words  (16-bytes)
+  10: 8 words  (32-bytes)
+  11: 16 words (64-bytes)
+*/
 initial begin
 
 	fd = $fopen("SumArray.x", "r");
@@ -54,7 +60,7 @@ initial begin
 	address = start_addr;
 	scan_fd = $fscanf(fd, "%x", data_in);
 	//data_in = 0;
-	access_size = 2'b0_1;
+	access_size = 2'b1_1;
 	enable = 1;
 	rw = 0;		// Start writing first.
 	words_read = 0;
