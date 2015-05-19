@@ -8,9 +8,9 @@ add wave -noupdate /memory_tb/M0/rw
 add wave -noupdate /memory_tb/M0/enable
 add wave -noupdate /memory_tb/M0/busy
 add wave -noupdate /memory_tb/M0/data_out
-add wave -noupdate -expand /memory_tb/M0/mem
+add wave -noupdate /memory_tb/M0/mem
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {979 ps} 0}
+WaveRestoreCursors {{Cursor 1} {13 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
