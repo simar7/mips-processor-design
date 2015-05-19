@@ -82,7 +82,7 @@ begin : WRITE
 			// reset stuff when all words in the access_size window are written.
 			else begin
 				//busy = 0;
-				words_written <= 0;
+				words_written = 0;
 			end
 		end
 		// 10: 8 words
