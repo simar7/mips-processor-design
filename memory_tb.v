@@ -88,11 +88,8 @@ always 	@(posedge clock) begin
 		words_read = words_read + 1;
 		
 	end
-	else if (rw == 0 || (words_read >= words_written)) begin
+	else if (words_read >= words_written) begin
 		// TODO: Add logic to end simulation.
-		enable = 0;
-		rw = 0;	// can write now.
-		@(posedge clock);
 	end
 
 end
