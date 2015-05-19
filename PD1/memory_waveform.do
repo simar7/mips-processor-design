@@ -1,22 +1,5 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
-add wave -noupdate -expand -group memory_tb /memory_tb/clock
-add wave -noupdate -expand -group memory_tb /memory_tb/address
-add wave -noupdate -expand -group memory_tb /memory_tb/data_in
-add wave -noupdate -expand -group memory_tb /memory_tb/access_size
-add wave -noupdate -expand -group memory_tb /memory_tb/rw
-add wave -noupdate -expand -group memory_tb /memory_tb/enable
-add wave -noupdate -expand -group memory_tb /memory_tb/busy
-add wave -noupdate -expand -group memory_tb /memory_tb/data_out
-add wave -noupdate -expand -group memory_tb /memory_tb/fd
-add wave -noupdate -expand -group memory_tb /memory_tb/scan_fd
-add wave -noupdate -expand -group memory_tb /memory_tb/status_read
-add wave -noupdate -expand -group memory_tb /memory_tb/status_write
-add wave -noupdate -expand -group memory_tb /memory_tb/sscanf_ret
-add wave -noupdate -expand -group memory_tb /memory_tb/words_read
-add wave -noupdate -expand -group memory_tb /memory_tb/words_written
-add wave -noupdate -expand -group memory_tb /memory_tb/line
-add wave -noupdate -expand -group memory_tb /memory_tb/data_read
 add wave -noupdate /memory_tb/M0/clock
 add wave -noupdate /memory_tb/M0/address
 add wave -noupdate /memory_tb/M0/data_in
@@ -25,20 +8,9 @@ add wave -noupdate /memory_tb/M0/rw
 add wave -noupdate /memory_tb/M0/enable
 add wave -noupdate /memory_tb/M0/busy
 add wave -noupdate /memory_tb/M0/data_out
-add wave -noupdate /memory_tb/M0/data
-add wave -noupdate /memory_tb/M0/global_cur_addr
-add wave -noupdate /memory_tb/M0/cyc_ctr
-add wave -noupdate /memory_tb/M0/i
-add wave -noupdate /memory_tb/M0/fd
-add wave -noupdate /memory_tb/M0/status_read
-add wave -noupdate /memory_tb/M0/status_write
-add wave -noupdate /memory_tb/M0/blah
-add wave -noupdate /memory_tb/M0/fd_in
-add wave -noupdate /memory_tb/M0/str
-add wave -noupdate /memory_tb/M0/mem
-add wave -noupdate /memory_tb/M0/busy_r
+add wave -noupdate -expand /memory_tb/M0/mem
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {2 ps} 0}
+WaveRestoreCursors {{Cursor 1} {979 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
