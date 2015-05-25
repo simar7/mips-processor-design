@@ -8,43 +8,63 @@ z2
 !i10f 100
 cModel Technology
 d/home/simar/School/ECE429/ece429/PD1
-vmemory
-Z0 !s110 1432442072
+vfetch
+Z0 !s110 1432447863
 !i10b 1
-!s100 BGbUoW6LUGj@XljR7ZH8j1
-IJ9nkN>ibPZ14IWj3[Q?]N3
+!s100 B>ZYhe<`jC4On98<;I^UI2
+IOa]PU^?2gF`g03[>T0CBj3
 Z1 V`JN@9S9cnhjKRR_L]QIcM3
 Z2 d/home/simar/School/ECE429/ece429/PD2
-Z3 w1432441673
+w1432447859
+8/home/simar/School/ECE429/ece429/PD2/fetch.v
+F/home/simar/School/ECE429/ece429/PD2/fetch.v
+L0 1
+Z3 OV;L;10.3d;59
+r1
+!s85 0
+31
+!s108 1432447863.506084
+!s107 /home/simar/School/ECE429/ece429/PD2/fetch.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/simar/School/ECE429/ece429/PD2/fetch.v|
+!i113 1
+Z4 o-work work
+vmemory
+R0
+!i10b 1
+!s100 nGoCHVlI`X1Wb_hR7OFT@1
+I_Ee1ElWaHcZMXM`98SD^B3
+R1
+R2
+w1432442257
 8/home/simar/School/ECE429/ece429/PD2/memory.v
 F/home/simar/School/ECE429/ece429/PD2/memory.v
 L0 3
-Z4 OV;L;10.3d;59
+R3
 r1
 !s85 0
 31
-!s108 1432442072.033217
+!s108 1432447863.530812
 !s107 /home/simar/School/ECE429/ece429/PD2/memory.v|
 !s90 -reportprogress|300|-work|work|-stats=none|/home/simar/School/ECE429/ece429/PD2/memory.v|
 !i113 1
-Z5 o-work work
+R4
 vmemory_tb
 R0
 !i10b 1
-!s100 5PAXW;G7fQ=6KcC<`O=cB3
-I_5nT9EAA=5KAg8[klk]3?1
+!s100 hI6ng1kzLjji4lmXicH3W0
+IA>>=W`K@EIVH81[T2h@4I2
 R1
 R2
-R3
+w1432442283
 8/home/simar/School/ECE429/ece429/PD2/memory_tb.v
 F/home/simar/School/ECE429/ece429/PD2/memory_tb.v
 L0 1
-R4
+R3
 r1
 !s85 0
 31
-!s108 1432442072.058860
+!s108 1432447863.556813
 !s107 /home/simar/School/ECE429/ece429/PD2/memory_tb.v|
 !s90 -reportprogress|300|-work|work|-stats=none|/home/simar/School/ECE429/ece429/PD2/memory_tb.v|
 !i113 1
-R5
+R4

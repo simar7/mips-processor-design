@@ -1,1 +1,15 @@
+/home/simar/School/ECE429/ece429/PD2/memory.v {1 {vlog -work work -stats=none /home/simar/School/ECE429/ece429/PD2/memory.v
+Model Technology ModelSim ALTERA vlog 10.3d Compiler 2014.10 Oct  7 2014
+-- Compiling module memory
 
+Top level modules:
+	memory
+
+} {} {}} /home/simar/School/ECE429/ece429/PD2/memory_tb.v {1 {vlog -work work -stats=none /home/simar/School/ECE429/ece429/PD2/memory_tb.v
+Model Technology ModelSim ALTERA vlog 10.3d Compiler 2014.10 Oct  7 2014
+-- Compiling module memory_tb
+
+Top level modules:
+	memory_tb
+
+} {} {}}
