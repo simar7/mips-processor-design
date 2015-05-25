@@ -31,6 +31,8 @@ addiu, slti, slti, sltiu, ori, xori
 J-type insn:
 j, jal, beq, beqz, bne, bnez, bgez, bgtz, blez, bltz
 
+https://www.student.cs.uwaterloo.ca/~isg/res/mips/opcodes
+
 */
 
 always @(posedge clock)
