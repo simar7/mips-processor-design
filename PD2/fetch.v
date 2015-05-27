@@ -1,8 +1,9 @@
-module fetch (clock, pc, rw, stall, access_size, enable);
+module fetch (clock, pc, rw, stall, access_size, enable, enable_fetch);
 
 // Input Ports
 input clock;
 input stall;
+input enable_fetch;
 
 // Output Ports
 output reg [31:0] pc;
@@ -17,6 +18,7 @@ parameter word_size = 4;
 // Registers
 reg [31:0] pc_reg;
 
+
 initial begin
 	pc = start_addr;
 end
@@ -24,19 +26,19 @@ end
 always @(posedge clock)
 begin: FETCH
 
-	if (!stall) begin
+	if (enable_fetch && !stall) begin
 
-		pc_reg	 	= pc_reg + 4;
+		//pc_reg	 	= pc_reg + 4;
 		
-		pc 		<= pc_reg;
+		pc 		<= pc + 4;
 		rw 		<= 1;		// Always set to 1 for Fetch Stage
 		access_size 	<= word_size;	// Always set to 1 word for Fetch Stage
 		enable		<= 1;
 
 
-	end else if (stall) begin
+	end else if (enable_fetch && stall) begin
 	
-		pc 		<= pc_reg;
+		pc 		<= pc;
 		rw		<= 1;		// Always set to 1 for Fetch Stage
 		access_size	<= word_size;	// Always set to 1 word for Fetch Stage
 		enable		<= 0;

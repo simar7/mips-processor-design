@@ -1,9 +1,11 @@
-module decode(clock, insn, pc, opcode_out, rs_out, rt_out, rd_out, sa_out, func_out);
+module decode(clock, insn, pc, opcode_out, rs_out, rt_out, rd_out, sa_out, func_out, enable_decode);
 
 // Input ports
 input clock;
 input [31:0] insn;
 input [31:0] pc;
+
+input enable_decode;
 
 // Registers
 reg [31:0] pc_reg;
@@ -91,28 +93,30 @@ https://www.student.cs.uwaterloo.ca/~isg/res/mips/opcodes
 always @(posedge clock)
 begin : DECODE
 
-	if (insn[31:26] == RTYPE) begin
-		// Instruction is R-type
-		// Further need to clasify function (add, sub, etc..)
-		case (insn[5:0])
-			ADD: begin
-				opcode_out = RTYPE;
-				rs_out = insn[25:21];
-				rt_out = insn[20:16];
-				rd_out = insn[15:11];
-				sa_out = insn[10:6];
-				func_out = insn[5:0];
-			end
-
-			MULT: begin
-				opcode_out = RTYPE;
-				rs_out = insn[25:21];
-				rt_out = insn[20:16];
-				rd_out = 00000;
-				sa_out = 00000;
-				func_out = insn[5:0];
-			end
-		endcase
+	if (enable_decode) begin
+		if (insn[31:26] == RTYPE) begin
+			// Instruction is R-type
+			// Further need to clasify function (add, sub, etc..)
+			case (insn[5:0])
+				ADD: begin
+					opcode_out = RTYPE;
+					rs_out = insn[25:21];
+					rt_out = insn[20:16];
+					rd_out = insn[15:11];
+					sa_out = insn[10:6];
+					func_out = insn[5:0];
+				end
+	
+				MULT: begin
+					opcode_out = RTYPE;
+					rs_out = insn[25:21];
+					rt_out = insn[20:16];
+					rd_out = 00000;
+					sa_out = 00000;
+					func_out = insn[5:0];
+				end
+			endcase
+		end
 	end
 end
 

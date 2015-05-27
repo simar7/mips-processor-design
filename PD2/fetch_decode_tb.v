@@ -17,9 +17,23 @@ reg [1:0] access_size;
 reg rw;
 reg enable;
 
+reg enable_fetch;
+reg enable_decode;
+reg [31:0] insn;
+reg [31:0] pc_decode;
+
+
 // Output Ports
 wire busy;
 wire [data_width-1:0] data_out;
+
+wire [31:0] pc;
+wire [5:0] opcode_out;
+wire [4:0] rs_out;
+wire [4:0] rt_out;
+wire [4:0] rd_out;
+wire [4:0] sa_out;
+wire [5:0] func_out;
 
 // fileIO stuff
 integer fd;
@@ -29,7 +43,13 @@ integer sscanf_ret;
 integer words_read;
 integer words_written;
 reg [31:0] line;
-reg [31:0] data_read;
+
+reg [5:0] opcode_out_tb;
+reg [4:0] rs_out_tb;
+reg [4:0] rt_out_tb;
+reg [4:0] rd_out_tb;
+reg [4:0] sa_out_tb;
+reg [5:0] func_out_tb;
 
 
 // Instantiate the memory module.
@@ -47,17 +67,26 @@ memory M0 (
 // Instantiate the fetch module.
 fetch F0 (
 	.clock (clock),
-	.pc (pc),
+	.pc (pc_fetch),
 	.rw (rw),
 	.stall (stall),
-	.access_size (access_size)
+	.access_size (access_size),
+	.enable (enable),
+	.enable_fetch (enable_fetch)
 );
 
 // Instantiate the decode module.
 decode D0 (
 	.clock (clock),
 	.insn (insn),
-	.pc (pc)
+	.pc (pc_decode),
+	.opcode_out (opcode_out),
+	.rs_out (rs_out),
+	.rt_out (rt_out),
+	.rd_out (rd_out),
+	.sa_out (sa_out),
+	.func_out (func_out),
+	.enable_decode (enable_decode)
 );
 
 
@@ -85,7 +114,7 @@ initial begin
 	words_written = 1;
 end
 
-always 	@(posedge clock) begin
+always 	@(posedge clock) begin: POPULATE
 	if (rw == 0) begin
 		enable = 1;
 		//rw = 0;
@@ -99,23 +128,33 @@ always 	@(posedge clock) begin
 		else begin
 			rw = 1;
 			address = 32'h80020000;
+			enable_fetch = 1;
 		end
 
 	end
-	else if ($feof(fd) && (words_read < words_written)) begin
-		// done writing, now read...
-		rw = 1;
-		enable = 1;
-		data_read = data_out;
-		$display("data_read = %x", data_read);
-		address = address + 4;
-		words_read = words_read + 1;
-		
-	end
-	else if (words_read >= words_written) begin
-		// TODO: Add logic to end simulation.
-	end
+end
 
+always @(posedge clock) begin: FETCHSTAGE
+	if (enable_fetch) begin
+		address = pc_fetch;
+		insn <= data_out;
+		pc_decode <= pc_fetch;
+
+		enable_decode <= 1;
+	end
+end
+
+always @(posedge clock) begin: DECODESTAGE
+	if (enable_decode) begin
+		opcode_out_tb = opcode_out;
+		rs_out_tb = rs_out;
+		rt_out_tb = rt_out;
+		rd_out_tb = rd_out;
+		sa_out_tb = sa_out;
+		func_out_tb = func_out;
+
+		$display("OPCODE=%b RS=%b RT=%b RD=%b SA=%b FUNC=%b", opcode_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out, func_out_tb);
+	end
 end
 
 always
