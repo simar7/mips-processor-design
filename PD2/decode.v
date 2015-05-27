@@ -1,4 +1,4 @@
-module decode(clock, insn, pc);
+module decode(clock, insn, pc, opcode_out, rs_out, rt_out, rd_out, sa_out, func_out);
 
 // Input ports
 input clock;
@@ -9,16 +9,58 @@ input [31:0] pc;
 reg [31:0] pc_reg;
 
 // Output
-output reg [31:0] decode_out;
-
 output reg [5:0] opcode_out;
 output reg [4:0] rs_out;
 output reg [4:0] rt_out;
 output reg [4:0] rd_out;
 output reg [4:0] sa_out;
 output reg [5:0] func_out;
-output reg [15:0] imm_out;
-output reg [25:0] target_out;
+//output reg [15:0] imm_out;
+//output reg [25:0] target_out;
+
+parameter ADD 	= 100000; //ADD;
+parameter ADDU 	= 100001; //ADDU;
+parameter SUB	= 100010; //SUB;
+parameter SUBU	= 100011; //SUBU;
+parameter MULT	= 011000; //MULT;
+parameter MULTU = 011001; //MULTU;
+parameter DIV	= 011010; //DIV;
+parameter DIVU 	= 011011; //DIVU;
+parameter MFHI	= 010000; //MFHI;
+parameter MFLO 	= 010010; //MFLO;
+parameter SLT	= 101010; //SLT;
+parameter SLTU	= 101011; //SLTU;
+parameter SLL	= 000000; //SLL;
+parameter SLLV	= 000100; //SLLV;
+parameter SRL	= 000010; //SRL;
+parameter SRLV	= 000110; //SRLV;
+parameter SRA	= 000011; //SRA;
+parameter SRAV	= 000111; //SRAV;
+parameter AND	= 100100; //AND;
+parameter OR	= 100101; //OR;
+parameter XOR	= 100110; //XOR;
+parameter NOR	= 100111; //NOR
+parameter JALR	= 001001; //JALR;
+parameter JR	= 001000; //JR;
+
+/*
+
+			6'b001001: //ADDIU
+			6'b001010: //SLTI
+			6'b001011: //SLTIU
+			6'b001101: //ORI
+			6'b001110: //XORI
+			6'b100011: //LW
+			6'b101011: //SW
+			6'b100000: //LB
+			6'b101000: //SB
+			6'b100100: //LBU
+			6'b000100: //BEQ
+			6'b000101: //BNE
+			6'b000111: //BGTZ
+*/
+
+parameter RTYPE = 000000; //R-Type INSN
 
 /*
   Instructions to support
@@ -49,63 +91,28 @@ https://www.student.cs.uwaterloo.ca/~isg/res/mips/opcodes
 always @(posedge clock)
 begin : DECODE
 
-	if (insn[31:26] == 6'b000000) begin
+	if (insn[31:26] == RTYPE) begin
 		// Instruction is R-type
 		// Further need to clasify function (add, sub, etc..)
 		case (insn[5:0])
-			6'b100000: //ADD;
-			6'b100001: //ADDU;
-			6'b100010: //SUB;
-			6'b100011: //SUBU;
-			6'b011000: //MULT;
-			6'b011001: //MULTU;
-			6'b011010: //DIV;
-			6'b011011: //DIVU;
-			6'b010000: //MFHI;
-			6'b010010: //MFLO;
-			6'b101010: //SLT;
-			6'b101011: //SLTU;
-			6'b000000: //SLL;
-			6'b000100: //SLLV;
-			6'b000010: //SRL;
-			6'b000110: //SRLV;
-			6'b000011: //SRA;
-			6'b000111: //SRAV;
-			6'b100100: //AND;
-			6'b100101: //OR;
-			6'b100110: //XOR;
-			6'b100111: //NOR
-			6'b001001: //JALR;
-			6'b001000: //JR;
-		endcase
-	
-	end else if (insn[31:26] != 6'b000000 || insn[31:27] != 5'b00001 || insn[31:28] != 4'b0100) begin
-		// Instruction is I-Type
-		case(insn[31:26])
-			6'b001001: //ADDIU
-			6'b001010: //SLTI
-			6'b001011: //SLTIU
-			6'b001101: //ORI
-			6'b001110: //XORI
-			6'b100011: //LW
-			6'b101011: //SW
-			6'b100000: //LB
-			6'b101000: //SB
-			6'b100100: //LBU
-			6'b000100: //BEQ
-			6'b000101: //BNE
-			6'b000111: //BGTZ
-		endcase
-		
-	end else if (insn[31:27] == 5'b00001) begin
-		// Instruction is J-Type
-		case(insn[26])
-			0: //J;
-			1: //JAL;
-		endcase
+			ADD: begin
+				opcode_out = RTYPE;
+				rs_out = insn[25:21];
+				rt_out = insn[20:16];
+				rd_out = insn[15:11];
+				sa_out = insn[10:6];
+				func_out = insn[5:0];
+			end
 
-	end else if (insn[31:0] == 32'h00000000) begin
-		// NOP
+			MULT: begin
+				opcode_out = RTYPE;
+				rs_out = insn[25:21];
+				rt_out = insn[20:16];
+				rd_out = 00000;
+				sa_out = 00000;
+				func_out = insn[5:0];
+			end
+		endcase
 	end
 end
 
