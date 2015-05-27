@@ -5,6 +5,13 @@ Model Technology ModelSim ALTERA vlog 10.3d Compiler 2014.10 Oct  7 2014
 Top level modules:
 	memory
 
+} {} {}} /home/raunaq/Documents/ece429/PD2/fetch.v {1 {vlog -work work -stats=none /home/raunaq/Documents/ece429/PD2/fetch.v
+Model Technology ModelSim ALTERA vlog 10.3d Compiler 2014.10 Oct  7 2014
+-- Compiling module fetch
+
+Top level modules:
+	fetch
+
 } {} {}} /home/simar/School/ECE429/ece429/PD2/memory.v {1 {vlog -work work -stats=none /home/simar/School/ECE429/ece429/PD2/memory.v
 Model Technology ModelSim ALTERA vlog 10.3d Compiler 2014.10 Oct  7 2014
 -- Compiling module memory
@@ -18,12 +25,5 @@ Model Technology ModelSim ALTERA vlog 10.3d Compiler 2014.10 Oct  7 2014
 
 Top level modules:
 	memory_tb
-
-} {} {}} /home/raunaq/Documents/ece429/PD2/decode.v {1 {vlog -work work -stats=none /home/raunaq/Documents/ece429/PD2/decode.v
-Model Technology ModelSim ALTERA vlog 10.3d Compiler 2014.10 Oct  7 2014
--- Compiling module decode
-
-Top level modules:
-	decode
 
 } {} {}}

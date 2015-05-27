@@ -21,7 +21,7 @@ output reg [5:0] func_out;
 //output reg [25:0] target_out;
 
 parameter ADD 	= 100000; //ADD;
-parameter ADDU 	= 100001; //ADDU;
+parameter ADDU 	= 6'b100001; //ADDU;
 parameter SUB	= 100010; //SUB;
 parameter SUBU	= 100011; //SUBU;
 parameter MULT	= 011000; //MULT;
@@ -98,7 +98,7 @@ begin : DECODE
 			// Instruction is R-type
 			// Further need to clasify function (add, sub, etc..)
 			case (insn[5:0])
-				ADD: begin
+				ADDU: begin
 					opcode_out = RTYPE;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];

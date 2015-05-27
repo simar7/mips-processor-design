@@ -21,6 +21,7 @@ reg enable_fetch;
 reg enable_decode;
 reg [31:0] insn;
 reg [31:0] pc_decode;
+reg stall;
 
 
 // Output Ports
@@ -100,7 +101,7 @@ decode D0 (
 */
 initial begin
 
-	fd = $fopen("SumArray.x", "r");
+	fd = $fopen("test.x", "r");
 	if (!fd)
 		$display("Could not open");
 
@@ -130,6 +131,7 @@ always 	@(posedge clock) begin: POPULATE
 			rw = 1;
 			address = 32'h80020000;
 			enable_fetch = 1;
+			stall = 0;
 		end
 
 	end
@@ -138,7 +140,7 @@ end
 always @(posedge clock) begin: FETCHSTAGE
 	if (enable_fetch) begin
 		address = pc_fetch;
-		insn <= data_out;
+		insn = data_out;
 		pc_decode <= pc_fetch;
 
 		enable_decode <= 1;
