@@ -1,4 +1,4 @@
-module memory_tb;
+module fetch_decode_tb;
 
 // Constants
 parameter data_width = 32;
@@ -27,13 +27,15 @@ reg [31:0] pc_decode;
 wire busy;
 wire [data_width-1:0] data_out;
 
-wire [31:0] pc;
+wire [31:0] pc_fetch;
 wire [5:0] opcode_out;
 wire [4:0] rs_out;
 wire [4:0] rt_out;
 wire [4:0] rd_out;
 wire [4:0] sa_out;
 wire [5:0] func_out;
+wire rw_fetch;
+wire [31:0] access_size_fetch;
 
 // fileIO stuff
 integer fd;
@@ -68,10 +70,9 @@ memory M0 (
 fetch F0 (
 	.clock (clock),
 	.pc (pc_fetch),
-	.rw (rw),
+	.rw (rw_fetch),
 	.stall (stall),
-	.access_size (access_size),
-	.enable (enable),
+	.access_size (access_size_fetch),
 	.enable_fetch (enable_fetch)
 );
 
@@ -125,7 +126,7 @@ always 	@(posedge clock) begin: POPULATE
 			address = address + 4;
 			words_written = words_written + 1;	
 		end
-		else begin
+		else begin: ENDWRITE
 			rw = 1;
 			address = 32'h80020000;
 			enable_fetch = 1;
