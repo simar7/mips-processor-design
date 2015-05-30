@@ -35,6 +35,7 @@ wire [4:0] rt_out;
 wire [4:0] rd_out;
 wire [4:0] sa_out;
 wire [5:0] func_out;
+wire [25:0] imm_out;
 wire rw_fetch;
 wire [31:0] access_size_fetch;
 
@@ -56,6 +57,7 @@ reg [4:0] rt_out_tb;
 reg [4:0] rd_out_tb;
 reg [4:0] sa_out_tb;
 reg [5:0] func_out_tb;
+reg [5:0] imm_out_tb;
 
 
 // Instantiate the memory module.
@@ -90,6 +92,7 @@ decode D0 (
 	.rt_out (rt_out),
 	.rd_out (rd_out),
 	.sa_out (sa_out),
+	.imm_out (imm_out),
 	.func_out (func_out),
 	.enable_decode (enable_decode)
 );
@@ -145,8 +148,8 @@ end
 always @(posedge clock) begin: FETCHSTAGE
 	if (enable_fetch && (words_fetched <= words_written)) begin
 		address = pc_fetch;
-		insn = data_out;
-		pc_decode = pc_fetch;
+		insn <= data_out;
+		pc_decode <= pc_fetch;
 		words_fetched = words_fetched + 1;
 		enable_decode <= 1;
 	end
@@ -160,8 +163,9 @@ always @(posedge clock) begin: DECODESTAGE
 		rd_out_tb = rd_out;
 		sa_out_tb = sa_out;
 		func_out_tb = func_out;
+		imm_out_tb = imm_out;
 		words_decoded = words_decoded + 1;
-		$display("OPCODE=%b RS=%b RT=%b RD=%b SA=%b FUNC=%b", opcode_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out, func_out_tb);
+		$display("PC=%x OPCODE=%b RS/BASE=%b RT=%b RD=%b SA/OFFSET=%b IMM=%b FUNC=%b", pc_decode, opcode_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, imm_out_tb, func_out_tb);
 	end
 end
 

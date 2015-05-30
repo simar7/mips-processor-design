@@ -14,9 +14,6 @@ output reg [31:0] access_size;
 parameter start_addr = 32'h80020000;
 parameter word_size = 4;
 
-// Registers
-reg [31:0] pc_reg;
-
 
 initial begin
 	pc = start_addr;
