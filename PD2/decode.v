@@ -1,4 +1,4 @@
-module decode(clock, insn, pc, opcode_out, rs_out, rt_out, rd_out, sa_out, func_out, enable_decode);
+module decode(clock, insn, pc, opcode_out, rs_out, rt_out, rd_out, sa_out, func_out, imm_out, enable_decode);
 
 // Input ports
 input clock;
@@ -283,7 +283,7 @@ begin : DECODE
 					func_out = insn[5:0];
 				end
 			endcase
-		end else if (insn[31:26 != 6'b000000 || insn[31:27] != 5'b00001 || insn[31:28] != 4'b0100) begin
+		end else if (insn[31:26] != 6'b000000 || insn[31:27] != 5'b00001 || insn[31:28] != 4'b0100) begin
 			// Instruction is I-Type
 			// Further need to classify function (addiu, diviu, etc...)
 			case (insn[5:0])
@@ -389,11 +389,15 @@ begin : DECODE
 				JAL: begin
 					opcode_out = 000011;
 					imm_out[25:0] = insn[25:0];
-
 				end
 			endcase
 		end else if (insn[31:0] == 32'h00000000) begin
 				opcode_out = 000000;
+				rs_out = 00000;
+				rt_out = 00000;
+				rd_out = 00000;
+				sa_out = 00000;
+				func_out = 000000;
 		end
 
 	end
