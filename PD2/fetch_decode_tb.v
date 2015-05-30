@@ -35,7 +35,6 @@ wire [4:0] rt_out;
 wire [4:0] rd_out;
 wire [4:0] sa_out;
 wire [5:0] func_out;
-wire [25:0] imm_out;
 wire rw_fetch;
 wire [31:0] access_size_fetch;
 
@@ -46,6 +45,9 @@ integer status_read, status_write;
 integer sscanf_ret;
 integer words_read;
 integer words_written;
+integer words_fetched;
+integer words_decoded;
+
 reg [31:0] line;
 
 reg [5:0] opcode_out_tb;
@@ -54,7 +56,6 @@ reg [4:0] rt_out_tb;
 reg [4:0] rd_out_tb;
 reg [4:0] sa_out_tb;
 reg [5:0] func_out_tb;
-reg [25:0] imm_out_tb;
 
 
 // Instantiate the memory module.
@@ -89,7 +90,6 @@ decode D0 (
 	.rt_out (rt_out),
 	.rd_out (rd_out),
 	.sa_out (sa_out),
-	.imm_out (imm_out),
 	.func_out (func_out),
 	.enable_decode (enable_decode)
 );
@@ -117,6 +117,8 @@ initial begin
 	rw = 0;		// Start writing first.
 	words_read = 0;
 	words_written = 1;
+	words_fetched = 0;
+	words_decoded = 0;
 end
 
 always 	@(posedge clock) begin: POPULATE
@@ -133,7 +135,7 @@ always 	@(posedge clock) begin: POPULATE
 		else begin: ENDWRITE
 			rw = 1;
 			address = 32'h80020000;
-			enable_fetch = 1;
+			enable_fetch <= 1;
 			stall = 0;
 		end
 
@@ -141,26 +143,25 @@ always 	@(posedge clock) begin: POPULATE
 end
 
 always @(posedge clock) begin: FETCHSTAGE
-	if (enable_fetch) begin
-		address <= pc_fetch;
-		insn <= data_out;
-		pc_decode <= pc_fetch;
-
+	if (enable_fetch && (words_fetched <= words_written)) begin
+		address = pc_fetch;
+		insn = data_out;
+		pc_decode = pc_fetch;
+		words_fetched = words_fetched + 1;
 		enable_decode <= 1;
 	end
 end
 
 always @(posedge clock) begin: DECODESTAGE
-	if (enable_decode) begin
+	if (enable_decode && (words_decoded <= words_written)) begin
 		opcode_out_tb = opcode_out;
 		rs_out_tb = rs_out;
 		rt_out_tb = rt_out;
 		rd_out_tb = rd_out;
 		sa_out_tb = sa_out;
-		imm_out_tb = imm_out;
 		func_out_tb = func_out;
-
-		$display("PC=%h OPCODE=%b RS/BASE=%b RT=%b RD=%b SA=%b IMM/OFFSET=%b FUNC=%b", pc_decode, opcode_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, imm_out_tb, func_out_tb);
+		words_decoded = words_decoded + 1;
+		$display("OPCODE=%b RS=%b RT=%b RD=%b SA=%b FUNC=%b", opcode_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out, func_out_tb);
 	end
 end
 
