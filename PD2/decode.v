@@ -284,7 +284,7 @@ begin : DECODE
 					func_out = insn[5:0];
 				end
 			endcase
-		end else if (insn[31:26] != 6'b000000 || insn[31:27] != 5'b00001 || insn[31:28] != 4'b0100) begin
+		end else if (insn[31:26] != 6'b000000 && insn[31:27] != 5'b00001) begin
 			// Instruction is I-Type
 			// Further need to classify function (addiu, diviu, etc...)
 			case (insn[31:26])
@@ -292,56 +292,80 @@ begin : DECODE
 					opcode_out = ADDI;		
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
+					rd_out = 5'bxxxxx;
+					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0];
+					func_out = 6'bxxxx;
 				end
 
 				ADDIU: begin
 					opcode_out = ADDIU;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
+					rd_out = 5'bxxxxx;
+					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
+					func_out = 6'bxxxxx;
 				end
 				
 				SLTI: begin
 					opcode_out = SLTI;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
+					rd_out = 5'bxxxxx;
+					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
+					func_out = 6'bxxxxx;
 				end
 
 				SLTIU: begin
 					opcode_out = SLTIU;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
+					rd_out = 5'bxxxxx;
+					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
+					func_out = 6'bxxxxx;
 				end
 
 				ORI: begin
 					opcode_out = ORI;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
+					rd_out = 5'bxxxxx;
+					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
+					func_out = 6'bxxxxx;
 				end
 
 				XORI: begin
 					opcode_out = XORI;
 					rs_out = insn[25:21];		
-					rt_out = insn[20:16];		
+					rt_out = insn[20:16];	
+					rd_out = 5'bxxxxx;	
+					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0];   // Most significant 16-bits are immediate target
+					func_out = 6'bxxxxx;
 				end
 
 				LW: begin
 					opcode_out = LW;
 					rs_out = insn[25:21];		// BASE
 					rt_out = insn[20:16];		// RT
+					rd_out = 5'bxxxxx;
+					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0];    // OFFSET
+					func_out = 6'bxxxxx;
 				end
 
 				SW: begin
 					opcode_out = SW;
 					rs_out = insn[25:21];		// BASE
 					rt_out = insn[20:16];		// RT
+					rd_out = 5'bxxxxx;
+					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0];    // OFFSET
+					func_out = 6'bxxxxx;
 				end
 
 				LB: begin
@@ -388,7 +412,7 @@ begin : DECODE
 			endcase
 		end else if (insn[31:27] == 5'b00001) begin
 			// Instruction is J-Type
-			case (insn[26])
+			case (insn[26:26])
 				J: begin
 					opcode_out = 000010;
 					imm_out[25:0] = insn[25:0];
