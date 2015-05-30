@@ -293,6 +293,7 @@ begin : DECODE
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					imm_out[25:10] = insn[15:0];
+				end
 
 				ADDIU: begin
 					opcode_out = ADDIU;
