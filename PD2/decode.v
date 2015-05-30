@@ -17,8 +17,7 @@ output reg [4:0] rt_out;
 output reg [4:0] rd_out;
 output reg [4:0] sa_out;
 output reg [5:0] func_out;
-//output reg [15:0] imm_out;
-//output reg [25:0] target_out;
+output reg [25:0] imm_out;
 
 parameter ADD 	= 6'b100000; //ADD;
 parameter ADDU 	= 6'b100001; //ADDU;
@@ -59,6 +58,9 @@ parameter BEQ	= 6'b000100; //BEQ
 parameter BNE	= 6'b000101; //BNE
 parameter BGTZ	= 6'b000111; //BGTZ
 
+parameter J     = 1'b0;
+parameter JAL	= 1'b1;
+
 parameter RTYPE = 000000; //R-Type INSN
 
 /*
@@ -94,9 +96,10 @@ begin : DECODE
 		if (insn[31:26] == RTYPE) begin
 			// Instruction is R-type
 			// Further need to clasify function (add, sub, etc..)
+			opcode_out = RTYPE;
+
 			case (insn[5:0])
 				ADDU: begin
-					opcode_out = RTYPE;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
@@ -105,7 +108,6 @@ begin : DECODE
 				end
 
 				ADDU: begin
-					opcode_out = RTYPE;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
@@ -114,7 +116,6 @@ begin : DECODE
 				end
 
 				SUB: begin
-					opcode_out = RTYPE;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
@@ -123,7 +124,6 @@ begin : DECODE
 				end
 
 				SUBU: begin
-					opcode_out = RTYPE;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
@@ -132,7 +132,6 @@ begin : DECODE
 				end
 	
 				MULT: begin
-					opcode_out = RTYPE;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = 00000;
@@ -141,7 +140,6 @@ begin : DECODE
 				end
 
 				MULTU: begin
-					opcode_out = RTYPE;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = 00000;
@@ -150,7 +148,6 @@ begin : DECODE
 				end
 
 				DIV: begin
-					opcode_out = RTYPE;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = 00000;
@@ -159,7 +156,6 @@ begin : DECODE
 				end
 
 				DIVU: begin
-					opcode_out = RTYPE;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = 00000;
@@ -168,7 +164,6 @@ begin : DECODE
 				end
 
 				MFHI: begin
-					opcode_out = RTYPE;
 					rs_out = 00000;
 					rt_out = 00000;
 					rd_out = insn[15:11];
@@ -177,7 +172,6 @@ begin : DECODE
 				end
 
 				MFLO: begin
-					opcode_out = RTYPE;
 					rs_out = 00000;
 					rt_out = 00000;
 					rd_out = insn[15:11];
@@ -186,7 +180,6 @@ begin : DECODE
 				end
 
 				SLT: begin
-					opcode_out = RTYPE;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
@@ -195,7 +188,6 @@ begin : DECODE
 				end
 
 				SLTU: begin
-					opcode_out = RTYPE;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
@@ -204,7 +196,6 @@ begin : DECODE
 				end
 
 				SLL: begin
-					opcode_out = RTYPE;
 					rs_out = 00000;
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
@@ -213,7 +204,6 @@ begin : DECODE
 				end
 
 				SLLV: begin
-					opcode_out = RTYPE;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
@@ -222,7 +212,6 @@ begin : DECODE
 				end
 
 				SRL: begin
-					opcode_out = RTYPE;
 					rs_out = 00000;
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
@@ -231,7 +220,6 @@ begin : DECODE
 				end
 
 				SRLV: begin
-					opcode_out = RTYPE;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
@@ -240,7 +228,6 @@ begin : DECODE
 				end
 
 				SRA: begin
-					opcode_out = RTYPE;
 					rs_out = 00000;
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
@@ -249,7 +236,6 @@ begin : DECODE
 				end
 
 				SRAV: begin
-					opcode_out = RTYPE;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
@@ -258,7 +244,6 @@ begin : DECODE
 				end
 
 				AND: begin
-					opcode_out = RTYPE;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
@@ -267,7 +252,6 @@ begin : DECODE
 				end
 
 				OR: begin
-					opcode_out = RTYPE;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
@@ -276,7 +260,6 @@ begin : DECODE
 				end
 
 				NOR: begin
-					opcode_out = RTYPE;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
@@ -285,15 +268,134 @@ begin : DECODE
 				end
 
 				JALR: begin
-					opcode_out = RTYPE;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
 					sa_out = 00000;
 					func_out = insn[5:0];
 				end
+
+				JR: begin
+					rs_out = insn[25:21];
+					rt_out = 00000;
+					rd_out = 00000;
+					sa_out = 00000;
+					func_out = insn[5:0];
+				end
 			endcase
+		end else if (insn[31:26 != 6'b000000 || insn[31:27] != 5'b00001 || insn[31:28] != 4'b0100) begin
+			// Instruction is I-Type
+			// Further need to classify function (addiu, diviu, etc...)
+			case (insn[5:0])
+				ADDIU: begin
+					opcode_out = ADDIU;
+					rs_out = insn[25:21];
+					rt_out = insn[20:16];
+					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
+				end
+				
+				SLTI: begin
+					opcode_out = SLTI;
+					rs_out = insn[25:21];
+					rt_out = insn[20:16];
+					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
+				end
+
+				SLTIU: begin
+					opcode_out = SLTIU;
+					rs_out = insn[25:21];
+					rt_out = insn[20:16];
+					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
+				end
+
+				ORI: begin
+					opcode_out = ORI;
+					rs_out = insn[25:21];
+					rt_out = insn[20:16];
+					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
+				end
+
+				XORI: begin
+					opcode_out = XORI;
+					rs_out = insn[25:21];		
+					rt_out = insn[20:16];		
+					imm_out[25:10] = insn[15:0];   // Most significant 16-bits are immediate target
+				end
+
+				LW: begin
+					opcode_out = LW;
+					rs_out = insn[25:21];		// BASE
+					rt_out = insn[20:16];		// RT
+					imm_out[25:10] = insn[15:0];    // OFFSET
+				end
+
+				SW: begin
+					opcode_out = SW;
+					rs_out = insn[25:21];		// BASE
+					rt_out = insn[20:16];		// RT
+					imm_out[25:10] = insn[15:0];    // OFFSET
+				end
+
+				LB: begin
+					opcode_out = LB;
+					rs_out = insn[25:21];		// BASE
+					rt_out = insn[20:16];		// RT
+					imm_out[25:10] = insn[15:0];    // OFFSET
+				end
+
+				SB: begin
+					opcode_out = SB;
+					rs_out = insn[25:21];		// BASE
+					rt_out = insn[20:16];		// RT
+					imm_out[25:10] = insn[15:0];    // OFFSET
+				end
+
+				LBU: begin
+					opcode_out = LBU;
+					rs_out = insn[25:21];		// BASE
+					rt_out = insn[20:16];		// RT
+					imm_out[25:10] = insn[15:0];    // OFFSET
+				end
+
+				BEQ: begin
+					opcode_out = BEQ;
+					rs_out = insn[25:21];
+					rt_out = insn[20:16];		
+					imm_out[25:10] = insn[15:0];    
+				end
+
+				BNE: begin
+					opcode_out = BNE;
+					rs_out = insn[25:21];		
+					rt_out = insn[20:16];		
+					imm_out[25:10] = insn[15:0];    
+				end
+
+				BGTZ: begin
+					opcode_out = BGTZ;
+					rs_out = insn[25:21];		
+					rt_out = insn[20:16];		
+					imm_out[25:10] = insn[15:0];    
+				end
+			endcase
+		end else if (insn[31:27] == 5'b00001) begin
+			// Instruction is J-Type
+			case (insn[26])
+				J: begin
+					opcode_out = 000010;
+					imm_out[25:0] = insn[25:0];
+				end
+
+				JAL: begin
+					opcode_out = 000011;
+					imm_out[25:0] = insn[25:0];
+
+				end
+			endcase
+		end else if (insn[31:0] == 32'h00000000) begin
+				opcode_out = 000000;
 		end
+
 	end
 end
 
