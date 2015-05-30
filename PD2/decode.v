@@ -44,6 +44,7 @@ parameter NOR	= 6'b100111; //NOR
 parameter JALR	= 6'b001001; //JALR;
 parameter JR	= 6'b001000; //JR;
 
+parameter ADDI  = 6'b001000; //ADDI (Used for pseudoinstruction : MOVE)
 parameter ADDIU = 6'b001001; //ADDIU
 parameter SLTI  = 6'b001010; //SLTI
 parameter SLTIU = 6'b001011; //SLTIU
@@ -287,6 +288,12 @@ begin : DECODE
 			// Instruction is I-Type
 			// Further need to classify function (addiu, diviu, etc...)
 			case (insn[31:26])
+				ADDI: begin
+					opcode_out = ADDI;		// Used for pseudoinstruction MOVE
+					rs_out = insn[25:21];
+					rt_out = insn[20:16];
+					imm_out[25:10] = insn[15:0];
+
 				ADDIU: begin
 					opcode_out = ADDIU;
 					rs_out = insn[25:21];
