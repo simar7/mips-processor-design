@@ -57,7 +57,7 @@ reg [4:0] rt_out_tb;
 reg [4:0] rd_out_tb;
 reg [4:0] sa_out_tb;
 reg [5:0] func_out_tb;
-reg [5:0] imm_out_tb;
+reg [25:0] imm_out_tb;
 
 
 // Instantiate the memory module.
