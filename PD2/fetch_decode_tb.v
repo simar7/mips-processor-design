@@ -35,6 +35,7 @@ wire [4:0] rt_out;
 wire [4:0] rd_out;
 wire [4:0] sa_out;
 wire [5:0] func_out;
+wire [25:0] imm_out;
 wire rw_fetch;
 wire [31:0] access_size_fetch;
 
@@ -53,6 +54,7 @@ reg [4:0] rt_out_tb;
 reg [4:0] rd_out_tb;
 reg [4:0] sa_out_tb;
 reg [5:0] func_out_tb;
+reg [25:0] imm_out_tb;
 
 
 // Instantiate the memory module.
@@ -87,6 +89,7 @@ decode D0 (
 	.rt_out (rt_out),
 	.rd_out (rd_out),
 	.sa_out (sa_out),
+	.imm_out (imm_out),
 	.func_out (func_out),
 	.enable_decode (enable_decode)
 );
@@ -101,7 +104,7 @@ decode D0 (
 */
 initial begin
 
-	fd = $fopen("test.x", "r");
+	fd = $fopen("SumArray.x", "r");
 	if (!fd)
 		$display("Could not open");
 
@@ -139,8 +142,8 @@ end
 
 always @(posedge clock) begin: FETCHSTAGE
 	if (enable_fetch) begin
-		address = pc_fetch;
-		insn = data_out;
+		address <= pc_fetch;
+		insn <= data_out;
 		pc_decode <= pc_fetch;
 
 		enable_decode <= 1;
@@ -154,9 +157,10 @@ always @(posedge clock) begin: DECODESTAGE
 		rt_out_tb = rt_out;
 		rd_out_tb = rd_out;
 		sa_out_tb = sa_out;
+		imm_out_tb = imm_out;
 		func_out_tb = func_out;
 
-		$display("OPCODE=%b RS=%b RT=%b RD=%b SA=%b FUNC=%b", opcode_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out, func_out_tb);
+		$display("PC=%h OPCODE=%b RS/BASE=%b RT=%b RD=%b SA=%b IMM/OFFSET=%b FUNC=%b", pc_decode, opcode_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, imm_out_tb, func_out_tb);
 	end
 end
 

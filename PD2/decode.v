@@ -286,7 +286,7 @@ begin : DECODE
 		end else if (insn[31:26] != 6'b000000 || insn[31:27] != 5'b00001 || insn[31:28] != 4'b0100) begin
 			// Instruction is I-Type
 			// Further need to classify function (addiu, diviu, etc...)
-			case (insn[5:0])
+			case (insn[31:26])
 				ADDIU: begin
 					opcode_out = ADDIU;
 					rs_out = insn[25:21];

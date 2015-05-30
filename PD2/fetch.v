@@ -26,8 +26,6 @@ always @(posedge clock)
 begin: FETCH
 
 	if (enable_fetch && !stall) begin
-
-		//pc_reg	 	= pc_reg + 4;
 		
 		pc 		<= pc + 4;
 		rw 		<= 1;		// Always set to 1 for Fetch Stage
