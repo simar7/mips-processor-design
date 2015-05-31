@@ -1,4 +1,4 @@
-module decode(clock, insn, pc, opcode_out, rs_out, rt_out, rd_out, sa_out, func_out, imm_out, enable_decode);
+module decode(clock, insn, pc, opcode_out, rs_out, rt_out, rd_out, sa_out, func_out, imm_out, enable_decode, pc_out);
 
 // Input ports
 input clock;
@@ -18,6 +18,8 @@ output reg [4:0] rd_out;
 output reg [4:0] sa_out;
 output reg [5:0] func_out;
 output reg [25:0] imm_out;
+
+output reg [31:0] pc_out;
 
 parameter ADD 	= 6'b100000; //ADD;
 parameter ADDU 	= 6'b100001; //ADDU;
@@ -97,6 +99,7 @@ always @(posedge clock)
 begin : DECODE
 
 	if (enable_decode) begin
+		pc_out <= pc;
 		if (insn[31:26] == RTYPE || insn[31:26] == MUL_OP) begin
 			// Instruction is R-type
 			// Further need to clasify function (add, sub, etc..)
