@@ -44,6 +44,9 @@ parameter NOR	= 6'b100111; //NOR
 parameter JALR	= 6'b001001; //JALR;
 parameter JR	= 6'b001000; //JR;
 
+parameter MUL_OP = 6'b011100; //MUL OPCODE
+parameter MUL_FUNC = 6'b000010;  //MUL FUNCTION CODE
+
 parameter ADDI  = 6'b001000; //ADDI (Used for pseudoinstruction : LI)
 parameter ADDIU = 6'b001001; //ADDIU
 parameter SLTI  = 6'b001010; //SLTI
@@ -59,8 +62,8 @@ parameter BEQ	= 6'b000100; //BEQ
 parameter BNE	= 6'b000101; //BNE
 parameter BGTZ	= 6'b000111; //BGTZ
 
-parameter J     = 1'b0;
-parameter JAL	= 1'b1;
+parameter J     = 6'b000010;
+parameter JAL	= 6'b000011;
 
 parameter RTYPE = 000000; //R-Type INSN
 
@@ -94,7 +97,7 @@ always @(posedge clock)
 begin : DECODE
 
 	if (enable_decode) begin
-		if (insn[31:26] == RTYPE) begin
+		if (insn[31:26] == RTYPE || insn[31:26] == MUL_OP) begin
 			// Instruction is R-type
 			// Further need to clasify function (add, sub, etc..)
 			opcode_out = RTYPE;
@@ -104,7 +107,8 @@ begin : DECODE
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
-					sa_out = insn[10:6];
+					sa_out = insn[10:6];	
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -113,6 +117,7 @@ begin : DECODE
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
 					sa_out = insn[10:6];
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -121,6 +126,7 @@ begin : DECODE
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
 					sa_out = insn[10:6];
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -129,14 +135,26 @@ begin : DECODE
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
 					sa_out = insn[10:6];
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
-	
+
+				MUL_FUNC: begin
+					opcode_out = MUL_OP;
+					rs_out = insn[25:21];
+					rt_out = insn[20:16];
+					rd_out = insn[15:11];
+					sa_out = 00000;
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
+					func_out = insn[5:0];
+				end	
+
 				MULT: begin
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = 00000;
 					sa_out = 00000;
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -145,6 +163,7 @@ begin : DECODE
 					rt_out = insn[20:16];
 					rd_out = 00000;
 					sa_out = 00000;
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -153,6 +172,7 @@ begin : DECODE
 					rt_out = insn[20:16];
 					rd_out = 00000;
 					sa_out = 00000;
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -161,6 +181,7 @@ begin : DECODE
 					rt_out = insn[20:16];
 					rd_out = 00000;
 					sa_out = 00000;
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -169,6 +190,7 @@ begin : DECODE
 					rt_out = 00000;
 					rd_out = insn[15:11];
 					sa_out = 00000;
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -177,6 +199,7 @@ begin : DECODE
 					rt_out = 00000;
 					rd_out = insn[15:11];
 					sa_out = 00000;
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -185,6 +208,7 @@ begin : DECODE
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
 					sa_out = 00000;
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -193,6 +217,7 @@ begin : DECODE
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
 					sa_out = 00000;
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -201,6 +226,7 @@ begin : DECODE
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
 					sa_out = insn[15:6];
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -209,6 +235,7 @@ begin : DECODE
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
 					sa_out = 00000;
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -225,6 +252,7 @@ begin : DECODE
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
 					sa_out = 00000;
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -233,6 +261,7 @@ begin : DECODE
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
 					sa_out = insn[10:6];
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -241,6 +270,7 @@ begin : DECODE
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
 					sa_out = 00000;
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -249,6 +279,7 @@ begin : DECODE
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
 					sa_out = 00000;
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -257,6 +288,7 @@ begin : DECODE
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
 					sa_out = 00000;
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -265,6 +297,7 @@ begin : DECODE
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
 					sa_out = 00000;
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -273,6 +306,7 @@ begin : DECODE
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
 					sa_out = 00000;
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 
@@ -281,6 +315,7 @@ begin : DECODE
 					rt_out = 00000;
 					rd_out = 00000;
 					sa_out = 00000;
+					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 				end
 			endcase
@@ -307,7 +342,17 @@ begin : DECODE
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
 					func_out = 6'bxxxxx;
 				end
-				
+
+				ADDI: begin
+					opcode_out = ADDI;		
+					rs_out = insn[25:21];
+					rt_out = insn[20:16];
+					rd_out = 5'bxxxxx;
+					sa_out = 5'bxxxxx;
+					imm_out[25:10] = insn[15:0];
+					func_out = 6'bxxxx;
+				end
+
 				SLTI: begin
 					opcode_out = SLTI;
 					rs_out = insn[25:21];
@@ -317,6 +362,7 @@ begin : DECODE
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
 					func_out = 6'bxxxxx;
 				end
+
 
 				SLTIU: begin
 					opcode_out = SLTIU;
@@ -370,57 +416,86 @@ begin : DECODE
 
 				LB: begin
 					opcode_out = LB;
-					rs_out = insn[25:21];		// BASE
-					rt_out = insn[20:16];		// RT
-					imm_out[25:10] = insn[15:0];    // OFFSET
+					rs_out = insn[25:21];		
+					rt_out = insn[20:16];	
+					rd_out = 5'bxxxxx;
+					sa_out = 5'bxxxxx;	
+					imm_out[25:10] = insn[15:0]; 
+					func_out = 6'bxxxxxx;
 				end
 
 				SB: begin
 					opcode_out = SB;
-					rs_out = insn[25:21];		// BASE
-					rt_out = insn[20:16];		// RT
-					imm_out[25:10] = insn[15:0];    // OFFSET
+					rs_out = insn[25:21];		
+					rt_out = insn[20:16];	
+					rd_out = 5'bxxxxx;
+					sa_out = 5'bxxxxx;	
+					imm_out[25:10] = insn[15:0]; 
+					func_out = 6'bxxxxxx;
 				end
 
 				LBU: begin
 					opcode_out = LBU;
-					rs_out = insn[25:21];		// BASE
-					rt_out = insn[20:16];		// RT
-					imm_out[25:10] = insn[15:0];    // OFFSET
+					rs_out = insn[25:21];		
+					rt_out = insn[20:16];	
+					rd_out = 5'bxxxxx;
+					sa_out = 5'bxxxxx;	
+					imm_out[25:10] = insn[15:0]; 
+					func_out = 6'bxxxxxx;
 				end
 
 				BEQ: begin
 					opcode_out = BEQ;
-					rs_out = insn[25:21];
-					rt_out = insn[20:16];		
-					imm_out[25:10] = insn[15:0];    
+					rs_out = insn[25:21];		
+					rt_out = insn[20:16];	
+					rd_out = 5'bxxxxx;
+					sa_out = 5'bxxxxx;	
+					imm_out[25:10] = insn[15:0]; 
+					func_out = 6'bxxxxxx;  
 				end
 
 				BNE: begin
 					opcode_out = BNE;
 					rs_out = insn[25:21];		
-					rt_out = insn[20:16];		
-					imm_out[25:10] = insn[15:0];    
+					rt_out = insn[20:16];	
+					rd_out = 5'bxxxxx;
+					sa_out = 5'bxxxxx;	
+					imm_out[25:10] = insn[15:0]; 
+					func_out = 6'bxxxxxx;   
 				end
 
 				BGTZ: begin
 					opcode_out = BGTZ;
 					rs_out = insn[25:21];		
-					rt_out = insn[20:16];		
-					imm_out[25:10] = insn[15:0];    
+					rt_out = insn[20:16];	
+					rd_out = 5'bxxxxx;
+					sa_out = 5'bxxxxx;	
+					imm_out[25:10] = insn[15:0]; 
+					func_out = 6'bxxxxxx;
+    
 				end
 			endcase
 		end else if (insn[31:27] == 5'b00001) begin
 			// Instruction is J-Type
-			case (insn[26:26])
+			case (insn[31:26])
 				J: begin
-					opcode_out = 000010;
+					opcode_out = J;
+					rs_out = 5'bxxxxx;
+					rt_out = 5'bxxxxx;
+					rd_out = 5'bxxxxx;
+					sa_out = 5'bxxxxx;
 					imm_out[25:0] = insn[25:0];
+					func_out = 6'bxxxxxx;
 				end
 
 				JAL: begin
-					opcode_out = 000011;
+					opcode_out = JAL;
+					rs_out = 5'bxxxxx;
+					rt_out = 5'bxxxxx;
+					rd_out = 5'bxxxxx;
+					sa_out = 5'bxxxxx;
 					imm_out[25:0] = insn[25:0];
+					func_out = 6'bxxxxxx;
 				end
 			endcase
 		end else if (insn[31:0] == 32'h00000000) begin
@@ -429,9 +504,9 @@ begin : DECODE
 				rt_out = 00000;
 				rd_out = 00000;
 				sa_out = 00000;
+				imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 				func_out = 000000;
 		end
-
 	end
 end
 
