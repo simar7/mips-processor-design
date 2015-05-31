@@ -158,10 +158,10 @@ begin : READ
         	if (access_size == 2'b0_0 ) begin
         		// read 4 bytes at max in 1 clock cycle.
 			//assign data_out = {mem[address-start_addr], mem[address-start_addr+1], mem[address-start_addr+2], mem[address-start_addr+3]};
-			data_out[7:0] = mem[address-start_addr+3];
-			data_out[15:8] = mem[address-start_addr+2];
-			data_out[23:16] = mem[address-start_addr+1];
-			data_out[31:24] = mem[address-start_addr];
+			data_out[7:0] <= mem[address-start_addr+3];
+			data_out[15:8] <= mem[address-start_addr+2];
+			data_out[23:16] <= mem[address-start_addr+1];
+			data_out[31:24] <= mem[address-start_addr];
 		end
 		// 01: 4 words
 		else if (access_size == 2'b0_1) begin
