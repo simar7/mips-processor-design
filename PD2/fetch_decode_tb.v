@@ -140,7 +140,7 @@ always 	@(posedge clock) begin: POPULATE
 		else begin: ENDWRITE
 			rw = 1;
 			address = 32'h80020000;
-			enable_fetch = 1;
+			enable_fetch <= 1;
 			stall = 0;
 		end
 	end
@@ -148,9 +148,9 @@ always 	@(posedge clock) begin: POPULATE
 	if (enable_fetch && (words_fetched <= words_written)) begin : FETCHSTAGE
 		address = pc_fetch;
 		insn = data_out;
-		pc_decode = pc_fetch;
+		pc_decode <= pc_fetch;
 		words_fetched <= words_fetched + 1;
-		enable_decode = 1;
+		enable_decode <= 1;
 	end
 	
 	if (enable_decode && (words_decoded <= words_written)) begin : DECODESTAGE
