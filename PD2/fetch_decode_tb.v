@@ -128,7 +128,10 @@ initial begin
 	words_fetched = 0;
 	words_decoded = 0;
 	words_processed = 0;
-	stall = 1'bx;
+	fetch_not_enabled = 1;
+	decode_not_enabled = 1;
+
+	stall = 0;
 end
 
 always 	@(posedge clock) begin: POPULATE
@@ -144,38 +147,40 @@ always 	@(posedge clock) begin: POPULATE
 		end
 		else begin: ENDWRITE
 			rw <= 1;
-			address <= 32'hxxxxxxxx;
-			enable_fetch <= 1;
-			stall <= 0;
+			address <= 32'h80020000;
+			//enable_fetch <= 1;
+			stall = 0;
 		end
 	end
 	
-	/*
+	
 	if (rw == 1 && fetch_not_enabled == 1) begin: ENABLEFETCH
 		//address <= 32'h80020000;
+		//pc_decode <= pc_fetch;
 		enable_fetch <= 1;
 		fetch_not_enabled = 0;
 	end
-	*/
+	
 
 	if (enable_fetch && (words_fetched <= words_written)) begin : FETCHSTAGE
 		address = pc_fetch;
-		//insn <= data_out;		
+		insn <= data_out;
 		pc_decode <= pc_fetch;
-		words_fetched = words_fetched + 1;
-		enable_decode <= 1;
+		words_fetched <= words_fetched + 1;
+		//enable_decode <= 1;
 	end
 
-	/*
-	if ((words_fetched > 0) && (decode_not_enabled == 1)) begin: ENABLEDECODE
+	
+	if ((rw_fetch == 1) && (decode_not_enabled == 1)) begin: ENABLEDECODE
 		//address <= 32'h80020000;
 		enable_decode <= 1;
 		decode_not_enabled = 0;
 	end
-	*/
+	
 
 	if (enable_decode && (words_decoded <= words_written)) begin : DECODESTAGE
-		insn <= data_out;
+		//pc_decode <= pc_fetch;
+		
 		opcode_out_tb = opcode_out;
 		rs_out_tb = rs_out;
 		rt_out_tb = rt_out;
@@ -184,12 +189,12 @@ always 	@(posedge clock) begin: POPULATE
 		func_out_tb = func_out;
 		imm_out_tb = imm_out;
 		pc_out_tb = pc_out;
-		words_decoded = words_decoded + 1;
+		words_decoded <= words_decoded + 1;
 	end
 
 	if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed <= words_written)) begin : PRINT
 		words_processed = words_processed + 1;
-		$display("PC=%x OPCODE=%b RS/BASE=%b RT=%b RD=%b SA/OFFSET=%b IMM=%b FUNC=%b", pc_out, opcode_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, imm_out_tb, func_out_tb);
+		$display("PC=%x OPCODE=%b RS/BASE=%b RT=%b RD=%b SA/OFFSET=%b IMM=%b FUNC=%b", pc_out_tb, opcode_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, imm_out_tb, func_out_tb);
 	end	
 end
 
