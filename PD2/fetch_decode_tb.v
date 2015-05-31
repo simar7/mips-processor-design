@@ -50,6 +50,8 @@ integer words_written;
 integer words_fetched;
 integer words_decoded;
 integer words_processed;
+integer fetch_not_enabled;
+integer decode_not_enabled;
 
 reg [31:0] line;
 
@@ -126,6 +128,7 @@ initial begin
 	words_fetched = 0;
 	words_decoded = 0;
 	words_processed = 0;
+	stall = 0;
 end
 
 always 	@(posedge clock) begin: POPULATE
@@ -140,21 +143,37 @@ always 	@(posedge clock) begin: POPULATE
 			words_written = words_written + 1;	
 		end
 		else begin: ENDWRITE
-			rw = 1;
-			address = 32'h80020000;
+			rw <= 1;
+			address <= 32'h80020000;
 			enable_fetch <= 1;
 			stall = 0;
 		end
 	end
+	
+	/*
+	if (rw == 1 && fetch_not_enabled == 1) begin: ENABLEFETCH
+		//address <= 32'h80020000;
+		enable_fetch <= 1;
+		fetch_not_enabled = 0;
+	end
+	*/
 
 	if (enable_fetch && (words_fetched <= words_written)) begin : FETCHSTAGE
 		address = pc_fetch;
-		insn = data_out;
+		insn <= data_out;
 		pc_decode <= pc_fetch;
 		words_fetched <= words_fetched + 1;
 		enable_decode <= 1;
 	end
-	
+
+	/*
+	if ((words_fetched > 0) && (decode_not_enabled == 1)) begin: ENABLEDECODE
+		//address <= 32'h80020000;
+		enable_decode <= 1;
+		decode_not_enabled = 0;
+	end
+	*/
+
 	if (enable_decode && (words_decoded <= words_written)) begin : DECODESTAGE
 		opcode_out_tb = opcode_out;
 		rs_out_tb = rs_out;
@@ -167,7 +186,7 @@ always 	@(posedge clock) begin: POPULATE
 		words_decoded <= words_decoded + 1;
 	end
 
-	if((words_decoded > 1) && (words_fetched > 1) && enable_fetch && enable_decode && (words_processed <= words_written)) begin : PRINT
+	if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed <= words_written)) begin : PRINT
 		words_processed = words_processed + 1;
 		$display("PC=%x OPCODE=%b RS/BASE=%b RT=%b RD=%b SA/OFFSET=%b IMM=%b FUNC=%b", pc_out, opcode_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, imm_out_tb, func_out_tb);
 	end	
