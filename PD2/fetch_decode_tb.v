@@ -63,6 +63,7 @@ reg [4:0] sa_out_tb;
 reg [5:0] func_out_tb;
 reg [25:0] imm_out_tb;
 reg [31:0] pc_out_tb;
+reg [31:0] pc_from_fetch_temp;
 
 // Instantiate the memory module.
 memory M0 (
@@ -165,7 +166,8 @@ always 	@(posedge clock) begin: POPULATE
 	if (enable_fetch && (words_fetched <= words_written)) begin : FETCHSTAGE
 		address = pc_fetch;
 		insn <= data_out;
-		pc_decode <= pc_fetch;
+		pc_from_fetch_temp <= pc_fetch;
+		pc_decode = pc_from_fetch_temp;
 		words_fetched <= words_fetched + 1;
 		//enable_decode <= 1;
 	end
@@ -180,7 +182,7 @@ always 	@(posedge clock) begin: POPULATE
 
 	if (enable_decode && (words_decoded <= words_written)) begin : DECODESTAGE
 		//pc_decode <= pc_fetch;
-		
+		//pc_decode = pc_from_fetch_temp;
 		opcode_out_tb = opcode_out;
 		rs_out_tb = rs_out;
 		rt_out_tb = rt_out;
@@ -192,7 +194,7 @@ always 	@(posedge clock) begin: POPULATE
 		words_decoded <= words_decoded + 1;
 	end
 
-	if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed <= words_written)) begin : PRINT
+	if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin : PRINT
 		words_processed = words_processed + 1;
 		$display("PC=%x OPCODE=%b RS/BASE=%b RT=%b RD=%b SA/OFFSET=%b IMM=%b FUNC=%b", pc_out_tb, opcode_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, imm_out_tb, func_out_tb);
 	end	
