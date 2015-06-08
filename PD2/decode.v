@@ -1,4 +1,4 @@
-module decode(clock, insn, pc, opcode_out, rs_out, rt_out, rd_out, sa_out, func_out, imm_out, enable_decode, pc_out);
+module decode(clock, insn, pc, opcode_out, rs_out, rt_out, rd_out, sa_out, func_out, imm_out, enable_decode, pc_out, insn_out);
 
 // Input ports
 input clock;
@@ -20,6 +20,7 @@ output reg [5:0] func_out;
 output reg [25:0] imm_out;
 
 output reg [31:0] pc_out;
+output reg [31:0] insn_out;
 
 parameter ADD 	= 6'b100000; //ADD;
 parameter ADDU 	= 6'b100001; //ADDU;
@@ -58,6 +59,7 @@ parameter XORI  = 6'b001110; //XORI
 parameter LW	= 6'b100011; //LW
 parameter SW	= 6'b101011; //SW
 parameter LB	= 6'b100000; //LB
+parameter LUI   = 6'b001111; //LUI
 parameter SB	= 6'b101000; //SB
 parameter LBU	= 6'b100100; //LBU
 parameter BEQ	= 6'b000100; //BEQ
@@ -100,6 +102,7 @@ begin : DECODE
 
 	if (enable_decode) begin
 		pc_out <= pc;
+		insn_out <= insn;
 		if (insn[31:26] == RTYPE || insn[31:26] == MUL_OP) begin
 			// Instruction is R-type
 			// Further need to clasify function (add, sub, etc..)
@@ -346,16 +349,6 @@ begin : DECODE
 					func_out = 6'bxxxxx;
 				end
 
-				ADDI: begin
-					opcode_out = ADDI;		
-					rs_out = insn[25:21];
-					rt_out = insn[20:16];
-					rd_out = 5'bxxxxx;
-					sa_out = 5'bxxxxx;
-					imm_out[25:10] = insn[15:0];
-					func_out = 6'bxxxx;
-				end
-
 				SLTI: begin
 					opcode_out = SLTI;
 					rs_out = insn[25:21];
@@ -420,6 +413,16 @@ begin : DECODE
 				LB: begin
 					opcode_out = LB;
 					rs_out = insn[25:21];		
+					rt_out = insn[20:16];	
+					rd_out = 5'bxxxxx;
+					sa_out = 5'bxxxxx;	
+					imm_out[25:10] = insn[15:0]; 
+					func_out = 6'bxxxxxx;
+				end
+
+				LUI: begin
+					opcode_out = LUI;
+					rs_out = 5'b00000;		
 					rt_out = insn[20:16];	
 					rd_out = 5'bxxxxx;
 					sa_out = 5'bxxxxx;	
