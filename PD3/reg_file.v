@@ -30,7 +30,7 @@ assign rtOut = REGFILE[rtIn];
 always @(posedge clock)
 begin: REG_WRITE
 	if (we) begin
-		REGFILE [rdIn] <= dVal;
+		REGFILE [rdIn] = dVal;
 	end
 end 
 
