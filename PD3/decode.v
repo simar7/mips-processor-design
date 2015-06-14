@@ -1,11 +1,17 @@
-module decode(clock, insn, pc, opcode_out, rs_out, rt_out, rd_out, sa_out, func_out, imm_out, enable_decode, pc_out, insn_out);
+`include "decode_opcode.vh"
+
+module decode(clock, insn, pc, opcode_out, rs_out, rt_out, rd_out,
+	sa_out, func_out, imm_out, enable_decode, pc_out,
+	insn_out, ALUOp);
+
+// Control Registers
+output reg [5:0] ALUOp;
 
 // Input ports
-input clock;
-input [31:0] insn;
-input [31:0] pc;
-
-input enable_decode;
+input wire clock;
+input wire [31:0] insn;
+input wire [31:0] pc;
+input wire enable_decode;
 
 // Registers
 reg [31:0] pc_reg;
@@ -18,10 +24,10 @@ output reg [4:0] rd_out;
 output reg [4:0] sa_out;
 output reg [5:0] func_out;
 output reg [25:0] imm_out;
-
 output reg [31:0] pc_out;
 output reg [31:0] insn_out;
 
+// R-Type FUNC Codes
 parameter ADD 	= 6'b100000; //ADD;
 parameter ADDU 	= 6'b100001; //ADDU;
 parameter SUB	= 6'b100010; //SUB;
@@ -50,6 +56,7 @@ parameter JR	= 6'b001000; //JR;
 parameter MUL_OP = 6'b011100; //MUL OPCODE
 parameter MUL_FUNC = 6'b000010;  //MUL FUNCTION CODE
 
+// I-Type Opcodes
 parameter ADDI  = 6'b001000; //ADDI (Used for pseudoinstruction : LI)
 parameter ADDIU = 6'b001001; //ADDIU
 parameter SLTI  = 6'b001010; //SLTI
@@ -66,40 +73,14 @@ parameter BEQ	= 6'b000100; //BEQ
 parameter BNE	= 6'b000101; //BNE
 parameter BGTZ	= 6'b000111; //BGTZ
 
+// J-Type Opcodes
 parameter J     = 6'b000010;
 parameter JAL	= 6'b000011;
 
 parameter RTYPE = 000000; //R-Type INSN
 
-/*
-  Instructions to support
- 
-1) add, addiu, addu, sub, subu
-2) mult, multu, div, divu, mfhi, mflo
-3) slt, slti, sltu, sltiu
-4) sll, sllv, srl, srlv, sra, srav, and, or, ori, xor, xori, nor
-5) lw, sw, li (ori, lui), lb, sb, lbu, move
-6) j, jal, jalr, jr, beq, beqz, bne, bnez, bgez, bgtz, blez, bltz
-7) nop
-
-R-type insn: 
-add, sub, addu, subu, mult, multu, div, divu, mfhi,
-mflo, slt, sltu, sll, sllv, srl, srlv, sra, srav,
-and, or, xor, nor, jalr, jr, nop
-
-I-type insn:
-addiu, slti, slti, sltiu, ori, xori
-
-J-type insn:
-j, jal, beq, beqz, bne, bnez, bgez, bgtz, blez, bltz
-
-https://www.student.cs.uwaterloo.ca/~isg/res/mips/opcodes
-
-*/
-
 always @(posedge clock)
 begin : DECODE
-
 	if (enable_decode) begin
 		pc_out <= pc;
 		insn_out <= insn;
@@ -109,13 +90,15 @@ begin : DECODE
 			opcode_out = RTYPE;
 
 			case (insn[5:0])
-				ADDU: begin				// Used for MOVE pseudoinsn
+				ADD: begin				// Used for MOVE pseudoinsn
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
 					rd_out = insn[15:11];
 					sa_out = insn[10:6];	
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `ADD
+					
 				end
 
 				ADDU: begin
@@ -124,7 +107,8 @@ begin : DECODE
 					rd_out = insn[15:11];
 					sa_out = insn[10:6];
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
-					func_out = insn[5:0];
+					func_out = insn[5:0];	
+					ALUOp = `ADDU
 				end
 
 				SUB: begin
@@ -134,6 +118,7 @@ begin : DECODE
 					sa_out = insn[10:6];
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `SUB
 				end
 
 				SUBU: begin
@@ -143,6 +128,7 @@ begin : DECODE
 					sa_out = insn[10:6];
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `SUBU
 				end
 
 				MUL_FUNC: begin
@@ -153,6 +139,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `MUL
 				end	
 
 				MULT: begin
@@ -162,6 +149,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `MULT
 				end
 
 				MULTU: begin
@@ -171,6 +159,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `MULTU
 				end
 
 				DIV: begin
@@ -180,6 +169,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `DIV
 				end
 
 				DIVU: begin
@@ -189,6 +179,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `DIVU
 				end
 
 				MFHI: begin
@@ -198,6 +189,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `MFHI
 				end
 
 				MFLO: begin
@@ -207,6 +199,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `MFLO
 				end
 
 				SLT: begin
@@ -216,6 +209,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `SLT
 				end
 
 				SLTU: begin
@@ -225,6 +219,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `SLTU
 				end
 
 				SLL: begin
@@ -234,6 +229,7 @@ begin : DECODE
 					sa_out = insn[15:6];
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `SLL
 				end
 
 				SLLV: begin
@@ -243,6 +239,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `SLLV
 				end
 
 				SRL: begin
@@ -251,6 +248,7 @@ begin : DECODE
 					rd_out = insn[15:11];
 					sa_out = insn[10:6];
 					func_out = insn[5:0];
+					ALUOp = `SRL
 				end
 
 				SRLV: begin
@@ -260,6 +258,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `SRLV
 				end
 
 				SRA: begin
@@ -269,6 +268,7 @@ begin : DECODE
 					sa_out = insn[10:6];
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `SRA
 				end
 
 				SRAV: begin
@@ -278,6 +278,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `SRAV
 				end
 
 				AND: begin
@@ -287,6 +288,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `AND
 				end
 
 				OR: begin
@@ -296,6 +298,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `OR
 				end
 
 				NOR: begin
@@ -305,6 +308,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `NOR
 				end
 
 				JALR: begin
@@ -314,6 +318,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `JALR
 				end
 
 				JR: begin
@@ -323,6 +328,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
+					ALUOp = `JR
 				end
 			endcase
 		end else if (insn[31:26] != 6'b000000 && insn[31:27] != 5'b00001) begin
@@ -337,6 +343,7 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0];
 					func_out = 6'bxxxx;
+					ALUOp = `ADDI
 				end
 
 				ADDIU: begin
@@ -347,6 +354,7 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
 					func_out = 6'bxxxxx;
+					ALUOp = `ADDIU
 				end
 
 				SLTI: begin
@@ -357,6 +365,7 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
 					func_out = 6'bxxxxx;
+					ALUOp = `SLTI
 				end
 
 
@@ -368,6 +377,7 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
 					func_out = 6'bxxxxx;
+					ALUOp = `SLTIU
 				end
 
 				ORI: begin
@@ -378,6 +388,7 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
 					func_out = 6'bxxxxx;
+					ALUOp = `ORI
 				end
 
 				XORI: begin
@@ -388,6 +399,7 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0];   // Most significant 16-bits are immediate target
 					func_out = 6'bxxxxx;
+					ALUOp = `XORI
 				end
 
 				LW: begin
@@ -398,6 +410,7 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0];    // OFFSET
 					func_out = 6'bxxxxx;
+					ALUOp = `LW
 				end
 
 				SW: begin
@@ -408,6 +421,7 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0];    // OFFSET
 					func_out = 6'bxxxxx;
+					ALUOp = `SW
 				end
 
 				LB: begin
@@ -418,6 +432,7 @@ begin : DECODE
 					sa_out = 5'bxxxxx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'bxxxxxx;
+					ALUOp = `LB
 				end
 
 				LUI: begin
@@ -428,6 +443,7 @@ begin : DECODE
 					sa_out = 5'bxxxxx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'bxxxxxx;
+					ALUOp = `LUI
 				end
 
 				SB: begin
@@ -438,6 +454,7 @@ begin : DECODE
 					sa_out = 5'bxxxxx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'bxxxxxx;
+					ALUOp = `SB
 				end
 
 				LBU: begin
@@ -448,6 +465,7 @@ begin : DECODE
 					sa_out = 5'bxxxxx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'bxxxxxx;
+					ALUOp = `LBU
 				end
 
 				BEQ: begin
@@ -458,6 +476,7 @@ begin : DECODE
 					sa_out = 5'bxxxxx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'bxxxxxx;  
+					ALUOp = `BEQ
 				end
 
 				BNE: begin
@@ -467,7 +486,8 @@ begin : DECODE
 					rd_out = 5'bxxxxx;
 					sa_out = 5'bxxxxx;	
 					imm_out[25:10] = insn[15:0]; 
-					func_out = 6'bxxxxxx;   
+					func_out = 6'bxxxxxx; 
+					ALUOp = `BNE  
 				end
 
 				BGTZ: begin
@@ -478,6 +498,7 @@ begin : DECODE
 					sa_out = 5'bxxxxx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'bxxxxxx;
+					ALUOp = `BGTZ
     
 				end
 			endcase
@@ -492,6 +513,7 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:0] = insn[25:0];
 					func_out = 6'bxxxxxx;
+					ALUOp = `J
 				end
 
 				JAL: begin
@@ -502,6 +524,7 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:0] = insn[25:0];
 					func_out = 6'bxxxxxx;
+					ALUOp = `JAL
 				end
 			endcase
 		end else if (insn[31:0] == 32'h00000000) begin
@@ -512,6 +535,7 @@ begin : DECODE
 				sa_out = 00000;
 				imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 				func_out = 000000;
+				ALUOp = `NOP
 		end
 	end
 end
