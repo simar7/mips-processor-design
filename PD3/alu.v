@@ -2,10 +2,10 @@ module alu(clock, pc, insn, rsData, rtData, saData, immData, immSXData, ALUOp, d
 	
 input clock;
 input [31:0] pc, insn;
-input [4:0] rsData, rtData, saData;
+input [4:0]  rsData, rtData, saData;
 input [25:0] immData;
 input [31:0] immSXData;
-input [5:0] ALUOp;
+input [5:0]  ALUOp;
 
 output reg [31:0] dataOut;
 
@@ -71,7 +71,7 @@ parameter RTYPE = 6'b000000; //R-Type INSN
 always @(posedge clock)
 begin : EXECUTE
 	if(insn[31:26] == RTYPE) begin
-		case (ALUOp[5:0])
+		case (ALUOp)
 			ADD: begin
 				dataOut = rsData + rtData;
 			end
@@ -145,18 +145,18 @@ begin : EXECUTE
 			end
 		endcase
 	end else if (insn[31:26] != 6'b000000 && insn[31:27] != 5'b00001) begin
-		case (ALUOp[5:0])
+		case (ALUOp)
 			ADDI: begin
-				dataOut = rsData + immData[25:10];
+				dataOut = rsData + immSXData[15:0];
 			end
 
 			ADDIU: begin
-				dataOut = rsData + immData[25:10];
+				dataOut = rsData + immSXData[15:0];
 
 			end
 
 			SLTI: begin
-				if (rsData < immData[25:10]) begin
+				if (rsData < immSXData[15:0]) begin
 					dataOut = 32'h00000001;
 				end else begin
 					dataOut = 32'h00000000;
@@ -164,7 +164,7 @@ begin : EXECUTE
 			end
 
 			SLTIU: begin
-				if (rsData < immData[25:10]) begin
+				if (rsData < immSXData[15:0]) begin
 					dataOut = 32'h00000001;
 				end else begin
 					dataOut = 32'h00000000;
@@ -172,62 +172,62 @@ begin : EXECUTE
 			end
 
 			ORI: begin
-				dataOut = rsData | immData[25:10];
+				dataOut = rsData | immSXData[15:0];
 			end
 
 			XORI: begin
-				dataOut = rsData ^ immData[25:10];
+				dataOut = rsData ^ immSXData[15:0];
 			end
 
 			LW: begin
-				dataOut = rsData + immData[25:10];
+				dataOut = rsData + immSXData[15:0];
 			end
 
 			SW: begin
-				dataOut = rsData + immData[25:10];
+				dataOut = rsData + immSXData[15:0];
 			end
 
 			LB: begin
-				dataOut = rsData + immData[25:10];
+				dataOut = rsData + immSXData[15:0];
 			end
 		
 			LUI: begin
-				dataOut = immData[25:10] << 16;
+				dataOut = immSXData[15:0] << 16;
 			end
 
 			SB: begin
-				dataOut = rsData + immData[25:10];
+				dataOut = rsData + immSXData[15:0];
 			end
 			
 			LBU: begin
-				dataOut = rsData + immData[25:10];
+				dataOut = rsData + immSXData[15:0];
 			end
 
 			BEQ: begin
 		        	if (rsData == rtData) begin
-		        		dataOut = $signed(pc) + $signed(immData[25:10] << 2);
+		        		dataOut = $signed(pc) + $signed(immSXData[15:0] << 2);
 				end
 			end
 
 			BNE: begin
 				if (rsData != rtData) begin
-					dataOut = $signed(pc) + $signed(immData[25:10] << 2);
+					dataOut = $signed(pc) + $signed(immSXData[15:0] << 2);
 				end
 			end
 
 			BGTZ: begin
 				if (rsData > 0) begin
-					dataOut = $signed(pc) + $signed(immData[25:10] << 2);
+					dataOut = $signed(pc) + $signed(immSXData[15:0] << 2);
 				end
 			end
 
 			BLEZ: begin
 				if (rsData <= 0) begin
-					dataOut = $signed(pc) + $signed(immData[25:10] << 2);
+					dataOut = $signed(pc) + $signed(immSXData[15:0] << 2);
 				end
 			end
 		endcase
-	end			
+	end	
 end
 	
 endmodule
