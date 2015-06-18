@@ -141,6 +141,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];	
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				SUB: begin
