@@ -155,6 +155,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				SUBU: begin
@@ -165,6 +168,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				MUL_FUNC: begin
@@ -176,6 +182,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end	
 
 				MULT: begin
@@ -186,6 +195,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				MULTU: begin
@@ -196,6 +208,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				DIV: begin
@@ -206,6 +221,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				DIVU: begin
@@ -216,6 +234,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				MFHI: begin
@@ -226,6 +247,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				MFLO: begin
@@ -236,6 +260,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				SLT: begin
@@ -246,6 +273,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				SLTU: begin
@@ -256,6 +286,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				SLL: begin
@@ -266,6 +299,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				SLLV: begin
@@ -276,6 +312,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				SRL: begin
@@ -285,6 +324,9 @@ begin : DECODE
 					sa_out = insn[10:6];
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				SRLV: begin
@@ -295,6 +337,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				SRA: begin
@@ -305,6 +350,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				SRAV: begin
@@ -315,6 +363,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				AND: begin
@@ -325,6 +376,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				OR: begin
@@ -335,6 +389,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				NOR: begin
@@ -345,6 +402,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				JALR: begin
@@ -355,6 +415,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 
 				JR: begin
@@ -365,6 +428,9 @@ begin : DECODE
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
 					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 			endcase
 		end else if (insn[31:26] != 6'b000000 && insn[31:27] != 5'b00001) begin
