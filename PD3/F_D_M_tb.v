@@ -617,6 +617,7 @@ always 	@(posedge clock) begin: POPULATE
 		rtData_execute = rt_out;
 		saData_execute = sa_out;
 		imm_execute = imm_out_sx_decode;
+		ALUOp_execute = ALUOp_decode;
 
 		words_executed <= words_executed + 1;
 		
