@@ -77,7 +77,7 @@ reg enable_fetch;
 reg enable_decode;
 reg [31:0] pc_decode, insn;
 reg [31:0] pc_execute, insn_execute, rsData_execute, rtData_execute, imm_execute;
-reg [5:0] ALUOp;
+reg [5:0] ALUOp_execute;
 reg stall;
 
 // Output Ports
@@ -96,9 +96,11 @@ wire [31:0] pc_out;
 wire [31:0] insn_out;
 wire [31:0] rsOut_regfile;
 wire [31:0] rtOut_regfile;
+wire [31:0] dVal_regfile;
 wire rw_fetch;
 wire [31:0] access_size_fetch;
 wire [31:0] dataOut_execute;
+wire [5:0] ALUOp_decode;
 
 // fileIO stuff
 integer fd;
@@ -167,6 +169,7 @@ decode D0 (
 	.pc_out (pc_out),
 	.insn_out (insn_out),
 	.enable_decode (enable_decode),
+	.ALUOp (ALUOp_decode),
 	.rsOut_regfile (rsOut_regfile), 
 	.rtOut_regfile (rtOut_regfile), 
 	.dVal_regfile  (dVal_regfile),
@@ -174,13 +177,13 @@ decode D0 (
 );
 
 // Instantiate the execute module.
-execute X0 (
+alu X0 (
 	.clock (clock),
 	.pc (pc_execute),
 	.insn (insn_execute),
 	.rsData (rsData_execute),
 	.rtData (rtData_execute),
-	.ALUOp (ALUOp),
+	.ALUOp (ALUOp_execute),
 	.imm (imm_execute),
 	.dataOut (dataOut_execute)
 );
