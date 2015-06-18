@@ -65,6 +65,7 @@ parameter bits_in_bytes = 8-1;	// -1 for 0 based indexed
 parameter BYTE = 8;
 parameter start_addr = 32'h80020000;
 
+
 // Input Ports
 reg clock;
 reg [address_width-1:0] address;
@@ -72,18 +73,17 @@ reg [data_width-1:0] data_in;
 reg [1:0] access_size;
 reg rw;
 reg enable;
-
 reg enable_fetch;
 reg enable_decode;
 reg [31:0] pc_decode, insn_decode;
-reg [31:0] pc_execute, insn_execute, rsData_execute, rtData_execute, imm_execute;
-reg [5:0] ALUOp_execute;
+reg [31:0] pc_execute, insn_execute, imm_execute;
+reg [5:0]  rsData_execute, rtData_execute, saData_execute;
+reg [5:0]  ALUOp_execute;
 reg stall;
 
 // Output Ports
 wire busy;
 wire [data_width-1:0] data_out;
-
 wire [31:0] pc_fetch;
 wire [5:0] opcode_out;
 wire [4:0] rs_out;
@@ -103,6 +103,7 @@ wire [31:0] access_size_fetch;
 wire [31:0] dataOut_execute;
 wire [5:0] ALUOp_decode;
 
+
 // fileIO stuff
 integer fd;
 integer scan_fd;
@@ -121,6 +122,7 @@ integer execute_not_enabled;
 
 reg [31:0] line;
 
+// testbench registers
 reg [5:0] opcode_out_tb;
 reg [4:0] rs_out_tb;
 reg [4:0] rt_out_tb;
@@ -181,6 +183,7 @@ decode D0 (
 	.imm_out_sx    (imm_out_sx_decode)
 );
 
+
 // Instantiate the execute module.
 alu X0 (
 	.clock (clock),
@@ -188,8 +191,9 @@ alu X0 (
 	.insn (insn_execute),
 	.rsData (rsData_execute),
 	.rtData (rtData_execute),
+	.saData (saData_execute),
 	.ALUOp (ALUOp_execute),
-	.imm (imm_execute),
+	.immSXData (imm_execute),
 	.dataOut (dataOut_execute)
 );
 	
@@ -607,6 +611,18 @@ always 	@(posedge clock) begin: POPULATE
 		// FIXME: timing might be off here.
 		dataOut_execute_tb = dataOut_execute;
 		
+		/*
+			input clock;
+			input [31:0] pc, insn;
+			input [4:0] rsData, rtData, saData;
+			input [25:0] immData;
+			input [31:0] immSXData;
+			input [5:0] ALUOp;
+		*/
+	
+		rsData_execute = rs_out;
+		rtData_execute = rt_out;
+		saData_execute = sa_out;
 		words_executed <= words_executed + 1;
 		
 		if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_run < words_written)) begin
