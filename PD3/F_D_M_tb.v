@@ -75,10 +75,10 @@ reg enable;
 
 reg enable_fetch;
 reg enable_decode;
-reg [31:0] insn;
-reg [31:0] pc_decode;
+reg [31:0] pc_decode, insn;
+reg [31:0] pc_execute, insn_execute, rsData_execute, rtData_execute, imm_execute;
+reg [5:0] ALUOp;
 reg stall;
-
 
 // Output Ports
 wire busy;
@@ -98,6 +98,7 @@ wire [31:0] rsOut_regfile;
 wire [31:0] rtOut_regfile;
 wire rw_fetch;
 wire [31:0] access_size_fetch;
+wire [31:0] dataOut_execute;
 
 // fileIO stuff
 integer fd;
@@ -108,9 +109,11 @@ integer words_read;
 integer words_written;
 integer words_fetched;
 integer words_decoded;
+integer words_executed;
 integer words_processed;
 integer fetch_not_enabled;
 integer decode_not_enabled;
+integer execute_not_enabled;
 
 reg [31:0] line;
 
@@ -170,6 +173,18 @@ decode D0 (
 	.we_regfile    (we_regfile)
 );
 
+// Instantiate the execute module.
+execute X0 (
+	.clock (clock),
+	.pc (pc_execute),
+	.insn (insn_execute),
+	.rsData (rsData_execute),
+	.rtData (rtData_execute),
+	.ALUOp (ALUOp),
+	.imm (imm_execute),
+	.dataOut (dataOut_execute)
+);
+	
 initial begin
 
 	fd = $fopen("SimpleAdd.x", "r");
@@ -186,9 +201,11 @@ initial begin
 	words_written = 1;
 	words_fetched = 0;
 	words_decoded = 0;
+	words_executed = 0;
 	words_processed = 0;
 	fetch_not_enabled = 1;
 	decode_not_enabled = 1;
+	execute_not_enabled = 1;
 
 	stall = 0;
 end
@@ -213,7 +230,7 @@ always 	@(posedge clock) begin: POPULATE
 	end
 	
 	
-	if (rw == 1 && fetch_not_enabled == 1) begin: ENABLEFETCH
+	if (rw == 1 && fetch_not_enabled == 1) begin : ENABLEFETCH
 		//address <= 32'h80020000;
 		//pc_decode <= pc_fetch;
 		enable_fetch <= 1;
@@ -231,7 +248,7 @@ always 	@(posedge clock) begin: POPULATE
 	end
 
 	
-	if ((rw_fetch == 1) && (decode_not_enabled == 1)) begin: ENABLEDECODE
+	if ((rw_fetch == 1) && (decode_not_enabled == 1)) begin : ENABLEDECODE
 		//address <= 32'h80020000;
 		enable_decode <= 1;
 		decode_not_enabled = 0;
@@ -569,6 +586,13 @@ always 	@(posedge clock) begin: POPULATE
 		end	
 
 	
+	if (execute_not_enabled == 1) begin : ENABLEEXECUTE
+		execute_not_enabled = 0;
+	end
+
+	if (execute_not_enabled == 0 && words_executed <= words_written) begin : EXECUTESTAGE
+		// TODO: TB Logic for Execute stage
+	end
 end
 
 always
