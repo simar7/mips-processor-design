@@ -1,6 +1,6 @@
 module decode(clock, insn, pc, opcode_out, rs_out, rt_out, rd_out,
 	sa_out, func_out, imm_out, enable_decode, pc_out,
-	insn_out, ALUOp, rsOut_regfile, rtOut_regfile, dVal_regfile, we_regfile);
+	insn_out, ALUOp, rsOut_regfile, rtOut_regfile, dVal_regfile, we_regfile, imm_out_sx);
 
 // Control Registers
 output reg [5:0] ALUOp;
@@ -24,6 +24,7 @@ output reg [5:0] func_out;
 output reg [25:0] imm_out;
 output reg [31:0] pc_out;
 output reg [31:0] insn_out;
+output reg [31:0] imm_out_sx;
 
 // R-Type FUNC Codes
 parameter ADD 	= 6'b100000; //ADD;
@@ -381,6 +382,7 @@ begin : DECODE
 					ALUOp = opcode_out;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
+					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
 				end
 
 				ADDIU: begin
@@ -394,6 +396,7 @@ begin : DECODE
 					ALUOp = opcode_out;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
+					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
 				end
 
 				SLTI: begin
@@ -407,6 +410,7 @@ begin : DECODE
 					ALUOp = opcode_out;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
+					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
 				end
 
 
@@ -421,6 +425,7 @@ begin : DECODE
 					ALUOp = opcode_out;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
+					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
 				end
 
 				ORI: begin
@@ -434,6 +439,7 @@ begin : DECODE
 					ALUOp = opcode_out;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
+					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
 				end
 
 				XORI: begin
@@ -447,6 +453,7 @@ begin : DECODE
 					ALUOp = opcode_out;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
+					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
 				end
 
 				LW: begin
@@ -460,6 +467,7 @@ begin : DECODE
 					ALUOp = opcode_out;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
+					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
 				end
 
 				SW: begin
@@ -473,6 +481,7 @@ begin : DECODE
 					ALUOp = opcode_out;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
+					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
 				end
 
 				LB: begin
@@ -486,6 +495,7 @@ begin : DECODE
 					ALUOp = opcode_out;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
+					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
 				end
 
 				LUI: begin
@@ -499,6 +509,7 @@ begin : DECODE
 					ALUOp = opcode_out;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
+					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
 				end
 
 				SB: begin
@@ -512,6 +523,7 @@ begin : DECODE
 					ALUOp = opcode_out;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
+					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
 				end
 
 				LBU: begin
@@ -525,6 +537,7 @@ begin : DECODE
 					ALUOp = opcode_out;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
+					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
 				end
 
 				BEQ: begin
@@ -538,6 +551,7 @@ begin : DECODE
 					ALUOp = opcode_out;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
+					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
 				end
 
 				BNE: begin
@@ -551,6 +565,7 @@ begin : DECODE
 					ALUOp = opcode_out;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
+					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
 				end
 
 				BGTZ: begin
@@ -564,6 +579,7 @@ begin : DECODE
 					ALUOp = opcode_out;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
+					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
 				end
 			endcase
 		end else if (insn[31:27] == 5'b00001) begin
