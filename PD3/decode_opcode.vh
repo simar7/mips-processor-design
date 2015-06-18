@@ -43,7 +43,7 @@
 `define SB	6'b100100;
 `define LBU	6'b100101; 
 `define BEQ	6'b100110; 
-`define BNE	6'b100011; 
+`define BNE	6'b100111; 
 `define BGTZ	6'b101000; 
 
 // J-Type
