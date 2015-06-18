@@ -1,8 +1,6 @@
-`include "decode_opcode.vh"
-
 module decode(clock, insn, pc, opcode_out, rs_out, rt_out, rd_out,
 	sa_out, func_out, imm_out, enable_decode, pc_out,
-	insn_out, ALUOp);
+	insn_out, ALUOp, rsOut_regfile, rtOut_regfile, dVal_regfile, we_regfile);
 
 // Control Registers
 output reg [5:0] ALUOp;
@@ -53,6 +51,7 @@ parameter NOR	= 6'b100111; //NOR
 parameter JALR	= 6'b001001; //JALR;
 parameter JR	= 6'b001000; //JR;
 
+// MUL R-TYPE INSN
 parameter MUL_OP = 6'b011100; //MUL OPCODE
 parameter MUL_FUNC = 6'b000010;  //MUL FUNCTION CODE
 
@@ -77,7 +76,38 @@ parameter BGTZ	= 6'b000111; //BGTZ
 parameter J     = 6'b000010;
 parameter JAL	= 6'b000011;
 
-parameter RTYPE = 000000; //R-Type INSN
+parameter NOP   = 6'b000000;
+
+parameter RTYPE = 6'b000000; //R-Type INSN
+
+
+// Register File Logic
+parameter NUM_REGS = 32;
+parameter WIDTH = 32;
+parameter REG_WIDTH = 5;
+
+reg [REG_WIDTH - 1:0] rsIn_regfile, rtIn_regfile, rdIn_regfile;
+input [WIDTH - 1:0] dVal_regfile;
+input we_regfile;
+
+output [WIDTH - 1:0] rsOut_regfile, rtOut_regfile;
+
+reg [WIDTH - 1:0] REGFILE [NUM_REGS - 1:0];
+
+integer i_regfile;	
+
+// Combinationally write to rsOut and rtOut
+assign rsOut_regfile = REGFILE[rsIn_regfile];
+assign rtOut_regfile = REGFILE[rtIn_regfile];
+
+
+// Used for initializing REGFILE with values
+initial
+begin
+	for (i_regfile = 0; i_regfile < NUM_REGS; i_regfile = i_regfile + 1) begin
+		REGFILE[i_regfile] = i_regfile;
+	end
+end
 
 always @(posedge clock)
 begin : DECODE
@@ -97,8 +127,10 @@ begin : DECODE
 					sa_out = insn[10:6];	
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `ADD
-					
+					ALUOp = func_out;
+					rsIn_regfile = rs_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;					
 				end
 
 				ADDU: begin
@@ -108,7 +140,7 @@ begin : DECODE
 					sa_out = insn[10:6];
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];	
-					ALUOp = `ADDU
+					ALUOp = func_out;
 				end
 
 				SUB: begin
@@ -118,7 +150,7 @@ begin : DECODE
 					sa_out = insn[10:6];
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `SUB
+					ALUOp = func_out;
 				end
 
 				SUBU: begin
@@ -128,7 +160,7 @@ begin : DECODE
 					sa_out = insn[10:6];
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `SUBU
+					ALUOp = func_out;
 				end
 
 				MUL_FUNC: begin
@@ -139,7 +171,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `MUL
+					ALUOp = func_out;
 				end	
 
 				MULT: begin
@@ -149,7 +181,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `MULT
+					ALUOp = func_out;
 				end
 
 				MULTU: begin
@@ -159,7 +191,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `MULTU
+					ALUOp = func_out;
 				end
 
 				DIV: begin
@@ -169,7 +201,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `DIV
+					ALUOp = func_out;
 				end
 
 				DIVU: begin
@@ -179,7 +211,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `DIVU
+					ALUOp = func_out;
 				end
 
 				MFHI: begin
@@ -189,7 +221,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `MFHI
+					ALUOp = func_out;
 				end
 
 				MFLO: begin
@@ -199,7 +231,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `MFLO
+					ALUOp = func_out;
 				end
 
 				SLT: begin
@@ -209,7 +241,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `SLT
+					ALUOp = func_out;
 				end
 
 				SLTU: begin
@@ -219,7 +251,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `SLTU
+					ALUOp = func_out;
 				end
 
 				SLL: begin
@@ -229,7 +261,7 @@ begin : DECODE
 					sa_out = insn[15:6];
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `SLL
+					ALUOp = func_out;
 				end
 
 				SLLV: begin
@@ -239,7 +271,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `SLLV
+					ALUOp = func_out;
 				end
 
 				SRL: begin
@@ -248,7 +280,7 @@ begin : DECODE
 					rd_out = insn[15:11];
 					sa_out = insn[10:6];
 					func_out = insn[5:0];
-					ALUOp = `SRL
+					ALUOp = func_out;
 				end
 
 				SRLV: begin
@@ -258,7 +290,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `SRLV
+					ALUOp = func_out;
 				end
 
 				SRA: begin
@@ -268,7 +300,7 @@ begin : DECODE
 					sa_out = insn[10:6];
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `SRA
+					ALUOp = func_out;
 				end
 
 				SRAV: begin
@@ -278,7 +310,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `SRAV
+					ALUOp = func_out;
 				end
 
 				AND: begin
@@ -288,7 +320,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `AND
+					ALUOp = func_out;
 				end
 
 				OR: begin
@@ -298,7 +330,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `OR
+					ALUOp = func_out;
 				end
 
 				NOR: begin
@@ -308,7 +340,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `NOR
+					ALUOp = func_out;
 				end
 
 				JALR: begin
@@ -318,7 +350,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `JALR
+					ALUOp = func_out;
 				end
 
 				JR: begin
@@ -328,7 +360,7 @@ begin : DECODE
 					sa_out = 00000;
 					imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
 					func_out = insn[5:0];
-					ALUOp = `JR
+					ALUOp = func_out;
 				end
 			endcase
 		end else if (insn[31:26] != 6'b000000 && insn[31:27] != 5'b00001) begin
@@ -343,7 +375,9 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0];
 					func_out = 6'bxxxx;
-					ALUOp = `ADDI
+					ALUOp = opcode_out;
+					rsIn_regfile = rs_out;
+					rdIn_regfile = rt_out;
 				end
 
 				ADDIU: begin
@@ -354,7 +388,9 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
 					func_out = 6'bxxxxx;
-					ALUOp = `ADDIU
+					ALUOp = opcode_out;
+					rsIn_regfile = rs_out;
+					rdIn_regfile = rt_out;
 				end
 
 				SLTI: begin
@@ -365,7 +401,9 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
 					func_out = 6'bxxxxx;
-					ALUOp = `SLTI
+					ALUOp = opcode_out;
+					rsIn_regfile = rs_out;
+					rdIn_regfile = rt_out;
 				end
 
 
@@ -377,7 +415,9 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
 					func_out = 6'bxxxxx;
-					ALUOp = `SLTIU
+					ALUOp = opcode_out;
+					rsIn_regfile = rs_out;
+					rdIn_regfile = rt_out;
 				end
 
 				ORI: begin
@@ -388,7 +428,9 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
 					func_out = 6'bxxxxx;
-					ALUOp = `ORI
+					ALUOp = opcode_out;
+					rsIn_regfile = rs_out;
+					rdIn_regfile = rt_out;
 				end
 
 				XORI: begin
@@ -399,7 +441,9 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0];   // Most significant 16-bits are immediate target
 					func_out = 6'bxxxxx;
-					ALUOp = `XORI
+					ALUOp = opcode_out;
+					rsIn_regfile = rs_out;
+					rdIn_regfile = rt_out;
 				end
 
 				LW: begin
@@ -410,7 +454,9 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0];    // OFFSET
 					func_out = 6'bxxxxx;
-					ALUOp = `LW
+					ALUOp = opcode_out;
+					rsIn_regfile = rs_out;
+					rdIn_regfile = rt_out;
 				end
 
 				SW: begin
@@ -421,7 +467,9 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:10] = insn[15:0];    // OFFSET
 					func_out = 6'bxxxxx;
-					ALUOp = `SW
+					ALUOp = opcode_out;
+					rsIn_regfile = rs_out;
+					rdIn_regfile = rt_out;
 				end
 
 				LB: begin
@@ -432,7 +480,9 @@ begin : DECODE
 					sa_out = 5'bxxxxx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'bxxxxxx;
-					ALUOp = `LB
+					ALUOp = opcode_out;
+					rsIn_regfile = rs_out;
+					rdIn_regfile = rt_out;
 				end
 
 				LUI: begin
@@ -443,7 +493,9 @@ begin : DECODE
 					sa_out = 5'bxxxxx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'bxxxxxx;
-					ALUOp = `LUI
+					ALUOp = opcode_out;
+					rsIn_regfile = rs_out;
+					rdIn_regfile = rt_out;
 				end
 
 				SB: begin
@@ -454,7 +506,9 @@ begin : DECODE
 					sa_out = 5'bxxxxx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'bxxxxxx;
-					ALUOp = `SB
+					ALUOp = opcode_out;
+					rsIn_regfile = rs_out;
+					rdIn_regfile = rt_out;
 				end
 
 				LBU: begin
@@ -465,7 +519,9 @@ begin : DECODE
 					sa_out = 5'bxxxxx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'bxxxxxx;
-					ALUOp = `LBU
+					ALUOp = opcode_out;
+					rsIn_regfile = rs_out;
+					rdIn_regfile = rt_out;
 				end
 
 				BEQ: begin
@@ -476,7 +532,9 @@ begin : DECODE
 					sa_out = 5'bxxxxx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'bxxxxxx;  
-					ALUOp = `BEQ
+					ALUOp = opcode_out;
+					rsIn_regfile = rs_out;
+					rdIn_regfile = rt_out;
 				end
 
 				BNE: begin
@@ -487,7 +545,9 @@ begin : DECODE
 					sa_out = 5'bxxxxx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'bxxxxxx; 
-					ALUOp = `BNE  
+					ALUOp = opcode_out;
+					rsIn_regfile = rs_out;
+					rdIn_regfile = rt_out;
 				end
 
 				BGTZ: begin
@@ -498,8 +558,9 @@ begin : DECODE
 					sa_out = 5'bxxxxx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'bxxxxxx;
-					ALUOp = `BGTZ
-    
+					ALUOp = opcode_out;
+					rsIn_regfile = rs_out;
+					rdIn_regfile = rt_out;
 				end
 			endcase
 		end else if (insn[31:27] == 5'b00001) begin
@@ -513,7 +574,10 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:0] = insn[25:0];
 					func_out = 6'bxxxxxx;
-					ALUOp = `J
+					ALUOp = opcode_out;
+					rsIn_regfile = imm_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;		
 				end
 
 				JAL: begin
@@ -524,20 +588,31 @@ begin : DECODE
 					sa_out = 5'bxxxxx;
 					imm_out[25:0] = insn[25:0];
 					func_out = 6'bxxxxxx;
-					ALUOp = `JAL
+					ALUOp = opcode_out;
+					rsIn_regfile = imm_out;
+					rtIn_regfile = rt_out;
+					rdIn_regfile = rd_out;	
 				end
 			endcase
 		end else if (insn[31:0] == 32'h00000000) begin
-				opcode_out = 000000;
-				rs_out = 00000;
-				rt_out = 00000;
-				rd_out = 00000;
-				sa_out = 00000;
+				opcode_out = 6'b000000;
+				rs_out = 5'b00000;
+				rt_out = 5'b00000;
+				rd_out = 5'b00000;
+				sa_out = 5'b00000;
 				imm_out = 26'bxxxxxxxxxxxxxxxxxxxxxxxxxx;
-				func_out = 000000;
-				ALUOp = `NOP
+				func_out = 6'b000000;
+				ALUOp = NOP;
 		end
 	end
 end
+
+// Clocked write of writeback data
+always @(posedge clock)
+begin: REG_WRITE
+	if (we_regfile) begin
+		REGFILE [rdIn_regfile] = dVal_regfile;
+	end
+end 
 
 endmodule
