@@ -137,6 +137,7 @@ reg [31:0] pc_from_fetch_temp;
 reg [31:0] pc_from_decode_temp;
 reg [31:0] rsOut_regfile_tb;
 reg [31:0] rtOut_regfile_tb;
+reg [31:0] imm_out_sx_decode_tb;
 
 // Instantiate the memory module.
 memory M0 (
@@ -283,6 +284,7 @@ always 	@(posedge clock) begin: POPULATE
 		insn_out_tb = insn_decode_out;
 		rsOut_regfile_tb = rsOut_regfile;
 		rtOut_regfile_tb = rtOut_regfile;
+		imm_out_sx_decode_tb = imm_out_sx_decode;
 
 		pc_from_decode_temp <= pc_decode;
 		pc_execute = pc_from_decode_temp;
@@ -610,19 +612,12 @@ always 	@(posedge clock) begin: POPULATE
 	if (execute_not_enabled == 0 && words_executed <= words_written) begin : EXECUTESTAGE		
 		// FIXME: timing might be off here.
 		dataOut_execute_tb = dataOut_execute;
-		
-		/*
-			input clock;
-			input [31:0] pc, insn;
-			input [4:0] rsData, rtData, saData;
-			input [25:0] immData;
-			input [31:0] immSXData;
-			input [5:0] ALUOp;
-		*/
-	
+
 		rsData_execute = rs_out;
 		rtData_execute = rt_out;
 		saData_execute = sa_out;
+		imm_execute = imm_out_sx_decode;
+
 		words_executed <= words_executed + 1;
 		
 		if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_run < words_written)) begin
