@@ -50,6 +50,9 @@
 `define J	6'b101001;
 `define JAL	6'b101010;
 
+`define MUL_OP   6'b011100;  //MUL OPCODE
+`define MUL_FUNC 6'b000010;  //MUL FUNCTION CODE
+
 `define NOP	6'b101011;
 
 `endif
