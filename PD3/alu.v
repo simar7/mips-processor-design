@@ -1,9 +1,8 @@
-module alu(clock, pc, insn, rsData, rtData, saData, immData, immSXData, ALUOp, dataOut);
+module alu(clock, pc, insn, rsData, rtData, saData, immSXData, ALUOp, dataOut);
 	
 input clock;
 input [31:0] pc, insn;
 input [4:0]  rsData, rtData, saData;
-input [25:0] immData;
 input [31:0] immSXData;
 input [5:0]  ALUOp;
 

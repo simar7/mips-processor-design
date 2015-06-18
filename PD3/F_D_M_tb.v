@@ -77,7 +77,7 @@ reg enable_fetch;
 reg enable_decode;
 reg [31:0] pc_decode, insn_decode;
 reg [31:0] pc_execute, insn_execute, imm_execute;
-reg [5:0]  rsData_execute, rtData_execute, saData_execute;
+reg [4:0]  rsData_execute, rtData_execute, saData_execute;
 reg [5:0]  ALUOp_execute;
 reg stall;
 
