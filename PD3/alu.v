@@ -1,7 +1,7 @@
 module alu(clock, pc, insn, rsData, rtData, ALUOp, imm, dataOut);
 	
 input clock;
-input [31:0] pc, insn, rsData, rtData, imm;
+input [31:0] pc, insn, rsData, rtData, immData, saData;
 input [5:0] ALUOp;
 output reg [31:0] dataOut;
 
@@ -9,13 +9,13 @@ output reg [31:0] dataOut;
 parameter ADD 	= 6'b100000; //ADD;
 parameter ADDU 	= 6'b100001; //ADDU;
 parameter SUB	= 6'b100010; //SUB;
-parameter SUBU	= 6'b100011; //SUBU;
-parameter MULT	= 6'b011000; //MULT;
-parameter MULTU = 6'b011001; //MULTU;
-parameter DIV	= 6'b011010; //DIV;
-parameter DIVU 	= 6'b011011; //DIVU;
-parameter MFHI	= 6'b010000; //MFHI;
-parameter MFLO 	= 6'b010010; //MFLO;
+parameter SUBU	= 6'b100011; //SUBU;	
+parameter MULT	= 6'b011000; //MULT;		--
+parameter MULTU = 6'b011001; //MULTU;		--
+parameter DIV	= 6'b011010; //DIV;		--
+parameter DIVU 	= 6'b011011; //DIVU;		--
+parameter MFHI	= 6'b010000; //MFHI;		--
+parameter MFLO 	= 6'b010010; //MFLO;		--
 parameter SLT	= 6'b101010; //SLT;
 parameter SLTU	= 6'b101011; //SLTU;
 parameter SLL	= 6'b000000; //SLL;
@@ -28,8 +28,8 @@ parameter AND	= 6'b100100; //AND;
 parameter OR	= 6'b100101; //OR;
 parameter XOR	= 6'b100110; //XOR;
 parameter NOR	= 6'b100111; //NOR
-parameter JALR	= 6'b001001; //JALR;
-parameter JR	= 6'b001000; //JR;
+parameter JALR	= 6'b001001; //JALR;		--
+parameter JR	= 6'b001000; //JR;		--
 
 // MUL R-TYPE INSN
 parameter MUL_OP = 6'b011100; //MUL OPCODE
@@ -51,6 +51,10 @@ parameter LBU	= 6'b100100; //LBU
 parameter BEQ	= 6'b000100; //BEQ
 parameter BNE	= 6'b000101; //BNE
 parameter BGTZ	= 6'b000111; //BGTZ
+parameter BLEZ	= 6'b000110; //BLEZ
+
+parameter BLTZ = 6'bx; // TODO: implement this, uses some REGIMM opcode
+parameter BGEZ = 6'bx; // TODO: 
 
 // J-Type Opcodes
 parameter J     = 6'b000010;
@@ -67,8 +71,159 @@ begin : EXECUTE
 			ADD: begin
 				dataOut = rsData + rtData;
 			end
+			
+			ADDU: begin
+				dataOut = rsData + rtData;
+			end
+
+			SUB: begin
+				dataOut = rsData - rtData;
+			end
+
+			SUBU: begin
+				dataOut = rsData - rtData;
+			end
+
+			SLT: begin
+				if (rsData < rtData) begin
+					dataOut = 32'h00000001;
+				end else begin
+					dataOut = 32'h00000000;
+				end
+			end
+
+			SLTU: begin
+				if (rsData < rtData) begin
+					dataOut = 32'h00000001;
+				end else begin
+					dataOut = 32'h00000000;
+				end
+			end
+
+			SLL: begin
+				dataOut = rtData << saData;
+			end
+
+			SLLV: begin
+				dataOut = rtData << rsData;
+			end
+
+			SRL: begin
+				dataOut = rtData >> saData;
+			end
+
+			SRLV: begin
+				dataOut = rtData >> rsData;
+			end
+
+			SRA: begin
+				dataOut = rtData >>> saData;
+			end
+
+			SRAV: begin
+				dataOut = rtData >>> rsData;
+			end
+
+			AND: begin
+				dataOut = rsData & rtData;
+			end
+
+			OR: begin
+				dataOut = rsData | rtData;
+			end
+
+			XOR: begin
+				dataOut = rsData ^ rtData;
+			end
+
+			NOR: begin
+				dataOut = ~(rsData | rtData);
+			end
 		endcase
-	end
+	end else if (insn[31:26] != 6'b000000 && insn[31:27] != 5'b00001) begin
+		case (ALUOp[5:0])
+			ADDI: begin
+				dataOut = rsData + immData;
+			end
+
+			ADDIU: begin
+				dataOut = rsData + immData;
+
+			end
+
+			SLTI: begin
+				if (rsData < immData) begin
+					dataOut = 32'h00000001;
+				end else begin
+					dataOut = 32'h00000000;
+				end
+			end
+
+			SLTIU: begin
+				if (rsData < immData) begin
+					dataOut = 32'h00000001;
+				end else begin
+					dataOut = 32'h00000000;
+				end	
+			end
+
+			ORI: begin
+				dataOut = rsData | immData;
+			end
+
+			XORI: begin
+				dataOut = rsData ^ immData;
+			end
+
+			LW: begin
+				dataOut = rsData + immData;
+			end
+
+			SW: begin
+				dataOut = rsData + immData;
+			end
+
+			LB: begin
+				dataOut = rsData + immData;
+			end
+		
+			LUI: begin
+				dataOut = immData << 16;
+			end
+
+			SB: begin
+				dataOut = rsData + immData;
+			end
+			
+			LBU: begin
+				dataOut = rsData + immData;
+			end
+
+			BEQ: begin
+		        	if (rsData == rtData) begin
+		        		dataOut = $signed(pc) + $signed(immData << 2);
+				end
+			end
+
+			BNE: begin
+				if (rsData != rtData) begin
+					dataOut = $signed(pc) + $signed(immData << 2);
+				end
+			end
+
+			BGTZ: begin
+				if (rsData > 0) begin
+					dataOut = $signed(pc) + $signed(immData << 2);
+				end
+			end
+
+			BLEZ: begin
+				if (rsData <= 0) begin
+					dataOut = $signed(pc) + $signed(immData << 2);
+				end
+			end
+		endcase
+	end			
 end
 	
 endmodule
