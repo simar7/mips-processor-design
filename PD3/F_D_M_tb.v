@@ -299,6 +299,7 @@ always 	@(posedge clock) begin: POPULATE
 		pc_from_decode_temp <= pc_out;
 		pc_execute = pc_from_decode_temp;
 		insn_execute <= insn_decode;
+		enable_execute <= 1;
 
 		words_decoded <= words_decoded + 1;
 
@@ -617,9 +618,9 @@ always 	@(posedge clock) begin: POPULATE
 	
 	
 	if (words_decoded > 0) begin : ENABLEEXECUTE
-		enable_execute = 1;
+		//enable_execute = 1;
 		execute_not_enabled = 0;
-		we_regfile = 1;
+		we_regfile <= 1;
 	end
 
 	if (enable_execute == 1 && execute_not_enabled == 0 && words_executed <= words_written) begin : EXECUTESTAGE		
@@ -632,7 +633,7 @@ always 	@(posedge clock) begin: POPULATE
 		imm_execute = imm_out_sx_decode;
 		ALUOp_execute = ALUOp_decode;
 		dVal_regfile <= dataOut_execute;
-		we_regfile = 0;
+		we_regfile <= 0;
 
 		words_executed = words_executed + 1;
 		
