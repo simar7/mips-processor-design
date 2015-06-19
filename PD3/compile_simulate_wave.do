@@ -1,3 +1,5 @@
+# Quit current sim
+quit -sim
 # Compile Design
 vlog *.v
 # Load Design
