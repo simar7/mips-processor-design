@@ -647,7 +647,12 @@ always 	@(posedge clock) begin: POPULATE
 		
 		if((words_executed > 0) && (words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_run < words_written)) begin
 			words_run = words_run + 1;
-			$display("%x INSN=%x ALUOp_execute=%b DATAOUT=%x branch_taken=%b", pc_execute, insn_execute, ALUOp_execute, dataOut_execute_tb, branch_taken_tb);
+
+			if (branch_taken_tb == 1) begin
+				$display("%x INSN=%x ALUOp_execute=%b DATAOUT=%x branch_taken=%b", pc_execute, insn_execute, ALUOp_execute, dataOut_execute_tb, branch_taken_tb);
+			end else begin
+				$display("%x INSN=%x ALUOp_execute=%b DATAOUT=%x branch_taken=NA", pc_execute, insn_execute, ALUOp_execute, dataOut_execute_tb);
+			end
 		end
 	end
 

@@ -58,7 +58,7 @@ parameter J     = 6'b000010;
 parameter JAL	= 6'b000011;
 
 // Other 
-parameter NOP   = 6'b000000;
+parameter NOP   = 32'h000000;
 parameter RTYPE = 6'b000000;
 /******************************************/
 
@@ -78,6 +78,7 @@ output reg branch_taken;
 
 always @(ALUOp, rsData, rtData)
 begin : EXECUTE
+	branch_taken = 0;
 //if (enable_execute) begin
 	if(insn[31:26] == RTYPE) begin
 		case (ALUOp)
@@ -321,6 +322,8 @@ begin : EXECUTE
 				branch_taken = 1;
 			end
 		endcase
+	end else if (insn == NOP) begin
+		dataOut = dataOut;
 	end
 end
 //end
