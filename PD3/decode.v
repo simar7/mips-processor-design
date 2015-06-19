@@ -721,7 +721,7 @@ end
 always @(posedge clock)
 begin: REG_WRITE
 	if (we_regfile) begin
-		REGFILE [rdIn_regfile] = dVal_regfile;
+		REGFILE [rdIn_regfile] <= dVal_regfile;
 	end
 end 
 

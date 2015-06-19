@@ -1,8 +1,8 @@
 module alu(clock, pc, insn, rsData, rtData, saData, immSXData, ALUOp, dataOut, branch_taken, enable_execute);
 
 input clock;
-input [31:0] pc, insn;
-input [4:0]  rsData, rtData, saData;
+input [31:0] pc, insn, rsData, rtData;
+input [4:0]  saData;
 input [31:0] immSXData;
 input [5:0]  ALUOp;
 input wire enable_execute;
@@ -228,7 +228,8 @@ if (enable_execute) begin
 			end
 		
 			LUI: begin
-				dataOut = immSXData[15:0] << 16;
+				//dataOut = immSXData[15:0] << 16;
+				dataOut = {immSXData[15:0], 16'd0};
 			end
 
 			SB: begin

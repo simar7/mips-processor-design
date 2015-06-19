@@ -77,10 +77,12 @@ reg enable_fetch;
 reg enable_decode;
 reg enable_execute;
 reg [31:0] pc_decode, insn_decode;
-reg [31:0] pc_execute, insn_execute, imm_execute;
-reg [4:0]  rsData_execute, rtData_execute, saData_execute;
+reg [31:0] pc_execute, insn_execute, imm_execute, rsData_execute, rtData_execute;
+reg [4:0]  saData_execute;
 reg [5:0]  ALUOp_execute;
+reg we_regfile;
 reg stall;
+reg [31:0] dVal_regfile;
 
 // Output Ports
 wire busy;
@@ -97,7 +99,6 @@ wire [31:0] pc_out;
 wire [31:0] insn_decode_out;
 wire [31:0] rsOut_regfile;
 wire [31:0] rtOut_regfile;
-wire [31:0] dVal_regfile;
 wire [31:0] imm_out_sx_decode;
 wire rw_fetch;
 wire [31:0] access_size_fetch;
@@ -290,7 +291,7 @@ always 	@(posedge clock) begin: POPULATE
 
 		pc_from_decode_temp <= pc_out;
 		pc_execute = pc_from_decode_temp;
-		insn_execute = insn_decode;
+		insn_execute <= insn_decode;
 
 		words_decoded <= words_decoded + 1;
 
@@ -607,26 +608,30 @@ always 	@(posedge clock) begin: POPULATE
 		end	
 
 	
-	if (execute_not_enabled == 1 && (words_decoded > 0)) begin : ENABLEEXECUTE
+	
+	if (words_decoded > 1) begin : ENABLEEXECUTE
 		enable_execute = 1;
 		execute_not_enabled = 0;
+		we_regfile = 1;
 	end
 
 	if (enable_execute == 1 && execute_not_enabled == 0 && words_executed <= words_written) begin : EXECUTESTAGE		
 		// FIXME: timing might be off here.
 		dataOut_execute_tb = dataOut_execute;
 
-		rsData_execute = rs_out;
-		rtData_execute = rt_out;
+		rsData_execute = rsOut_regfile;
+		rtData_execute = rtOut_regfile;
 		saData_execute = sa_out;
 		imm_execute = imm_out_sx_decode;
 		ALUOp_execute = ALUOp_decode;
+		dVal_regfile <= dataOut_execute;
+		we_regfile = 0;
 
 		words_executed <= words_executed + 1;
 		
 		if((words_executed > 0) && (words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_run < words_written)) begin
 			words_run = words_run + 1;
-			$display("DATAOUT=%b", dataOut_execute_tb);
+			$display("INSN=%x DATAOUT=%x", insn_execute, dataOut_execute_tb);
 		end
 	end
 
