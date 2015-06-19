@@ -1,16 +1,17 @@
 module F_D_M_tb;
 
+/****************OPCODES******************/
 // R-Type FUNC Codes
 parameter ADD 	= 6'b100000; //ADD;
 parameter ADDU 	= 6'b100001; //ADDU;
 parameter SUB	= 6'b100010; //SUB;
-parameter SUBU	= 6'b100011; //SUBU;
-parameter MULT	= 6'b011000; //MULT;
-parameter MULTU = 6'b011001; //MULTU;
-parameter DIV	= 6'b011010; //DIV;
-parameter DIVU 	= 6'b011011; //DIVU;
-parameter MFHI	= 6'b010000; //MFHI;
-parameter MFLO 	= 6'b010010; //MFLO;
+parameter SUBU	= 6'b100011; //SUBU;	
+parameter MULT	= 6'b011000; //MULT;	
+parameter MULTU = 6'b011001; //MULTU;		
+parameter DIV	= 6'b011010; //DIV;		
+parameter DIVU 	= 6'b011011; //DIVU;		
+parameter MFHI	= 6'b010000; //MFHI;		
+parameter MFLO 	= 6'b010010; //MFLO;		
 parameter SLT	= 6'b101010; //SLT;
 parameter SLTU	= 6'b101011; //SLTU;
 parameter SLL	= 6'b000000; //SLL;
@@ -23,15 +24,15 @@ parameter AND	= 6'b100100; //AND;
 parameter OR	= 6'b100101; //OR;
 parameter XOR	= 6'b100110; //XOR;
 parameter NOR	= 6'b100111; //NOR
-parameter JALR	= 6'b001001; //JALR;
-parameter JR	= 6'b001000; //JR;
+parameter JALR	= 6'b001001; //JALR;		
+parameter JR	= 6'b001000; //JR;		
 
-// MUL R-TYPE INSN
-parameter MUL_OP = 6'b011100; //MUL OPCODE
-parameter MUL_FUNC = 6'b000010;  //MUL FUNCTION CODE
+// MUL R-TYPE Opcode
+parameter MUL_OP = 6'b011100; 	//MUL OPCODE
+parameter MUL_FUNC = 6'b000010; //MUL FUNCTION CODE
 
 // I-Type Opcodes
-parameter ADDI  = 6'b001000; //ADDI (Used for pseudoinstruction : LI)
+parameter ADDI  = 6'b001000; //ADDI (LI)
 parameter ADDIU = 6'b001001; //ADDIU
 parameter SLTI  = 6'b001010; //SLTI
 parameter SLTIU = 6'b001011; //SLTIU
@@ -46,14 +47,20 @@ parameter LBU	= 6'b100100; //LBU
 parameter BEQ	= 6'b000100; //BEQ
 parameter BNE	= 6'b000101; //BNE
 parameter BGTZ	= 6'b000111; //BGTZ
+parameter BLEZ	= 6'b000110; //BLEZ
+
+// REGIMM Opcodes
+parameter BLTZ = 5'b00000; // BLTZ
+parameter BGEZ = 5'b00001; // BGEZ 
 
 // J-Type Opcodes
 parameter J     = 6'b000010;
 parameter JAL	= 6'b000011;
 
+// Other 
 parameter NOP   = 6'b000000;
-
-parameter RTYPE = 6'b000000; //R-Type INSN
+parameter RTYPE = 6'b000000;
+/******************************************/
 
 
 // Constants
