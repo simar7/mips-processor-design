@@ -24,5 +24,7 @@ onerror {resume}
 ::add watch /F_D_M_tb/rtData_execute -noglob -x 271.0 -y 0.0 -radix default -radixenum default
 ::add watch /F_D_M_tb/imm_out_sx_decode_tb -noglob -x 878.0 -y 336.0 -radix hexadecimal -radixenum default
 ::add watch /F_D_M_tb/saData_execute -noglob -x 271.0 -y 84.0 -radix hexadecimal -radixenum default
+::add watch /F_D_M_tb/enable_fetch -noglob -x 8.0 -y 525.0 -radix default -radixenum default
 ::add watch /F_D_M_tb/ALUOp_execute -noglob -x 0.0 -y 0.0 -radix hexadecimal -radixenum default
+::add watch /F_D_M_tb/enable_decode -noglob -x 13.0 -y 608.0 -radix default -radixenum default
 
