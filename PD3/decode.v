@@ -2,6 +2,68 @@ module decode(clock, insn, pc, opcode_out, rs_out, rt_out, rd_out,
 	sa_out, func_out, imm_out, enable_decode, pc_out,
 	insn_out, ALUOp, rsOut_regfile, rtOut_regfile, dVal_regfile, we_regfile, imm_out_sx);
 
+/****************OPCODES******************/
+// R-Type FUNC Codes
+parameter ADD 	= 6'b100000; //ADD;
+parameter ADDU 	= 6'b100001; //ADDU;
+parameter SUB	= 6'b100010; //SUB;
+parameter SUBU	= 6'b100011; //SUBU;	
+parameter MULT	= 6'b011000; //MULT;	
+parameter MULTU = 6'b011001; //MULTU;		
+parameter DIV	= 6'b011010; //DIV;		
+parameter DIVU 	= 6'b011011; //DIVU;		
+parameter MFHI	= 6'b010000; //MFHI;		
+parameter MFLO 	= 6'b010010; //MFLO;		
+parameter SLT	= 6'b101010; //SLT;
+parameter SLTU	= 6'b101011; //SLTU;
+parameter SLL	= 6'b000000; //SLL;
+parameter SLLV	= 6'b000100; //SLLV;
+parameter SRL	= 6'b000010; //SRL;
+parameter SRLV	= 6'b000110; //SRLV;
+parameter SRA	= 6'b000011; //SRA;
+parameter SRAV	= 6'b000111; //SRAV;
+parameter AND	= 6'b100100; //AND;
+parameter OR	= 6'b100101; //OR;
+parameter XOR	= 6'b100110; //XOR;
+parameter NOR	= 6'b100111; //NOR
+parameter JALR	= 6'b001001; //JALR;		
+parameter JR	= 6'b001000; //JR;		
+
+// MUL R-TYPE Opcode
+parameter MUL_OP = 6'b011100; 	//MUL OPCODE
+parameter MUL_FUNC = 6'b000010; //MUL FUNCTION CODE
+
+// I-Type Opcodes
+parameter ADDI  = 6'b001000; //ADDI (LI)
+parameter ADDIU = 6'b001001; //ADDIU
+parameter SLTI  = 6'b001010; //SLTI
+parameter SLTIU = 6'b001011; //SLTIU
+parameter ORI	= 6'b001101; //ORI
+parameter XORI  = 6'b001110; //XORI
+parameter LW	= 6'b100011; //LW
+parameter SW	= 6'b101011; //SW
+parameter LB	= 6'b100000; //LB
+parameter LUI   = 6'b001111; //LUI
+parameter SB	= 6'b101000; //SB
+parameter LBU	= 6'b100100; //LBU
+parameter BEQ	= 6'b000100; //BEQ
+parameter BNE	= 6'b000101; //BNE
+parameter BGTZ	= 6'b000111; //BGTZ
+parameter BLEZ	= 6'b000110; //BLEZ
+
+// REGIMM Opcodes
+parameter BLTZ = 5'b00000; // BLTZ
+parameter BGEZ = 5'b00001; // BGEZ 
+
+// J-Type Opcodes
+parameter J     = 6'b000010;
+parameter JAL	= 6'b000011;
+
+// Other 
+parameter NOP   = 6'b000000;
+parameter RTYPE = 6'b000000;
+/******************************************/
+
 // Control Registers
 output reg [5:0] ALUOp;
 
@@ -25,62 +87,6 @@ output reg [25:0] imm_out;
 output reg [31:0] pc_out;
 output reg [31:0] insn_out;
 output reg [31:0] imm_out_sx;
-
-// R-Type FUNC Codes
-parameter ADD 	= 6'b100000; //ADD;
-parameter ADDU 	= 6'b100001; //ADDU;
-parameter SUB	= 6'b100010; //SUB;
-parameter SUBU	= 6'b100011; //SUBU;
-parameter MULT	= 6'b011000; //MULT;
-parameter MULTU = 6'b011001; //MULTU;
-parameter DIV	= 6'b011010; //DIV;
-parameter DIVU 	= 6'b011011; //DIVU;
-parameter MFHI	= 6'b010000; //MFHI;
-parameter MFLO 	= 6'b010010; //MFLO;
-parameter SLT	= 6'b101010; //SLT;
-parameter SLTU	= 6'b101011; //SLTU;
-parameter SLL	= 6'b000000; //SLL;
-parameter SLLV	= 6'b000100; //SLLV;
-parameter SRL	= 6'b000010; //SRL;
-parameter SRLV	= 6'b000110; //SRLV;
-parameter SRA	= 6'b000011; //SRA;
-parameter SRAV	= 6'b000111; //SRAV;
-parameter AND	= 6'b100100; //AND;
-parameter OR	= 6'b100101; //OR;
-parameter XOR	= 6'b100110; //XOR;
-parameter NOR	= 6'b100111; //NOR
-parameter JALR	= 6'b001001; //JALR;
-parameter JR	= 6'b001000; //JR;
-
-// MUL R-TYPE INSN
-parameter MUL_OP = 6'b011100; //MUL OPCODE
-parameter MUL_FUNC = 6'b000010;  //MUL FUNCTION CODE
-
-// I-Type Opcodes
-parameter ADDI  = 6'b001000; //ADDI (Used for pseudoinstruction : LI)
-parameter ADDIU = 6'b001001; //ADDIU
-parameter SLTI  = 6'b001010; //SLTI
-parameter SLTIU = 6'b001011; //SLTIU
-parameter ORI	= 6'b001101; //ORI
-parameter XORI  = 6'b001110; //XORI
-parameter LW	= 6'b100011; //LW
-parameter SW	= 6'b101011; //SW
-parameter LB	= 6'b100000; //LB
-parameter LUI   = 6'b001111; //LUI
-parameter SB	= 6'b101000; //SB
-parameter LBU	= 6'b100100; //LBU
-parameter BEQ	= 6'b000100; //BEQ
-parameter BNE	= 6'b000101; //BNE
-parameter BGTZ	= 6'b000111; //BGTZ
-
-// J-Type Opcodes
-parameter J     = 6'b000010;
-parameter JAL	= 6'b000011;
-
-parameter NOP   = 6'b000000;
-
-parameter RTYPE = 6'b000000; //R-Type INSN
-
 
 // Register File Logic
 parameter NUM_REGS = 32;
@@ -128,7 +134,7 @@ begin : DECODE
 					sa_out = insn[10:6];	
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = ADD;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;		
@@ -142,7 +148,7 @@ begin : DECODE
 					sa_out = insn[10:6];
 					imm_out = 26'hx;
 					func_out = insn[5:0];	
-					ALUOp = func_out;
+					ALUOp = ADDU;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -156,7 +162,7 @@ begin : DECODE
 					sa_out = insn[10:6];
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = SUB;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -170,7 +176,7 @@ begin : DECODE
 					sa_out = insn[10:6];
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = SUBU;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -185,7 +191,7 @@ begin : DECODE
 					sa_out = 5'b0;
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = MUL_FUNC;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -199,7 +205,7 @@ begin : DECODE
 					sa_out = 5'b0;
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = MULT;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -213,7 +219,7 @@ begin : DECODE
 					sa_out = 5'b0;
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = MULTU;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -227,7 +233,7 @@ begin : DECODE
 					sa_out = 5'b0;
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = DIV;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -241,7 +247,7 @@ begin : DECODE
 					sa_out = 5'b0;
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = DIVU;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -255,7 +261,7 @@ begin : DECODE
 					sa_out = 5'b0;
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = MFHI;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -269,7 +275,7 @@ begin : DECODE
 					sa_out = 5'b0;
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = MFLO;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -283,7 +289,7 @@ begin : DECODE
 					sa_out = 5'b0;
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = SLT;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -297,7 +303,7 @@ begin : DECODE
 					sa_out = 5'b0;
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = SLTU;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -311,7 +317,7 @@ begin : DECODE
 					sa_out = insn[15:6];
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = SLL;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -325,7 +331,7 @@ begin : DECODE
 					sa_out = 5'b0;
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = SLLV;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -339,7 +345,7 @@ begin : DECODE
 					sa_out = insn[10:6];
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = SRL;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -353,7 +359,7 @@ begin : DECODE
 					sa_out = 5'b0;
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = SRLV;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -367,7 +373,7 @@ begin : DECODE
 					sa_out = insn[10:6];
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = SRA;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -381,7 +387,7 @@ begin : DECODE
 					sa_out = 5'b0;
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = SRAV;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -395,7 +401,7 @@ begin : DECODE
 					sa_out = 5'b0;
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = AND;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -409,7 +415,7 @@ begin : DECODE
 					sa_out = 5'b0;
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = OR;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -423,7 +429,7 @@ begin : DECODE
 					sa_out = 5'b0;
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = NOR;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -437,7 +443,7 @@ begin : DECODE
 					sa_out = 5'b0;
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = JALR;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -451,7 +457,7 @@ begin : DECODE
 					sa_out = 5'b0;
 					imm_out = 26'hx;
 					func_out = insn[5:0];
-					ALUOp = func_out;
+					ALUOp = JR;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
@@ -470,7 +476,7 @@ begin : DECODE
 					sa_out = 5'hx;
 					imm_out[25:10] = insn[15:0];
 					func_out = 6'hx;
-					ALUOp = opcode_out;
+					ALUOp = ADDI;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
 					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
@@ -484,7 +490,7 @@ begin : DECODE
 					sa_out = 5'hx;
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
 					func_out = 6'hx;
-					ALUOp = opcode_out;
+					ALUOp = ADDIU;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
 					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
@@ -498,7 +504,7 @@ begin : DECODE
 					sa_out = 5'hx;
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
 					func_out = 6'hx;
-					ALUOp = opcode_out;
+					ALUOp = SLTI;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
 					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
@@ -513,7 +519,7 @@ begin : DECODE
 					sa_out = 5'hx;
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
 					func_out = 6'hx;
-					ALUOp = opcode_out;
+					ALUOp = SLTIU;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
 					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
@@ -527,7 +533,7 @@ begin : DECODE
 					sa_out = 5'hx;
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
 					func_out = 6'hx;
-					ALUOp = opcode_out;
+					ALUOp = ORI;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
 					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
@@ -541,7 +547,7 @@ begin : DECODE
 					sa_out = 5'hx;
 					imm_out[25:10] = insn[15:0];   // Most significant 16-bits are immediate target
 					func_out = 6'hx;
-					ALUOp = opcode_out;
+					ALUOp = XORI;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
 					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
@@ -555,7 +561,7 @@ begin : DECODE
 					sa_out = 5'hx;
 					imm_out[25:10] = insn[15:0];    // OFFSET
 					func_out = 6'hx;
-					ALUOp = opcode_out;
+					ALUOp = LW;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
 					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
@@ -569,7 +575,7 @@ begin : DECODE
 					sa_out = 5'hx;
 					imm_out[25:10] = insn[15:0];    // OFFSET
 					func_out = 6'hx;
-					ALUOp = opcode_out;
+					ALUOp = SW;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
 					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
@@ -583,7 +589,7 @@ begin : DECODE
 					sa_out = 5'hx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'hx;
-					ALUOp = opcode_out;
+					ALUOp = LB;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
 					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
@@ -597,7 +603,7 @@ begin : DECODE
 					sa_out = 5'hx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'hx;
-					ALUOp = opcode_out;
+					ALUOp = LUI;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
 					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
@@ -611,7 +617,7 @@ begin : DECODE
 					sa_out = 5'hx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'hx;
-					ALUOp = opcode_out;
+					ALUOp = SB;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
 					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
@@ -625,7 +631,7 @@ begin : DECODE
 					sa_out = 5'hx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'hx;
-					ALUOp = opcode_out;
+					ALUOp = LBU;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
 					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
@@ -639,7 +645,7 @@ begin : DECODE
 					sa_out = 5'hx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'hx;  
-					ALUOp = opcode_out;
+					ALUOp = BEQ;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
 					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
@@ -653,7 +659,7 @@ begin : DECODE
 					sa_out = 5'hx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'hx; 
-					ALUOp = opcode_out;
+					ALUOp = BNE;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
 					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
@@ -667,7 +673,7 @@ begin : DECODE
 					sa_out = 5'hx;	
 					imm_out[25:10] = insn[15:0]; 
 					func_out = 6'hx;
-					ALUOp = opcode_out;
+					ALUOp = BGTZ;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
 					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
@@ -684,7 +690,7 @@ begin : DECODE
 					sa_out = 5'hx;
 					imm_out[25:0] = insn[25:0];
 					func_out = 6'hx;
-					ALUOp = opcode_out;
+					ALUOp = J;
 					rsIn_regfile = imm_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;		
@@ -698,14 +704,14 @@ begin : DECODE
 					sa_out = 5'hx;
 					imm_out[25:0] = insn[25:0];
 					func_out = 6'hx;
-					ALUOp = opcode_out;
+					ALUOp = JAL;
 					rsIn_regfile = imm_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
 				end
 			endcase
 		end else if (insn[31:0] == 32'h00000000) begin
-				opcode_out = 6'b000000;
+				opcode_out = NOP;
 				rs_out = 5'b00000;
 				rt_out = 5'b00000;
 				rd_out = 5'b00000;

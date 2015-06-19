@@ -1,30 +1,17 @@
 module alu(clock, pc, insn, rsData, rtData, saData, immSXData, ALUOp, dataOut, branch_taken, enable_execute);
 
-input clock;
-input [31:0] pc, insn, rsData, rtData;
-input [4:0]  saData;
-input [31:0] immSXData;
-input [5:0]  ALUOp;
-input wire enable_execute;
-
-reg [63:0] temp;
-reg [31:0] hi;
-reg [31:0] lo;
-
-output reg [31:0] dataOut;
-output reg branch_taken;
-
+/****************OPCODES******************/
 // R-Type FUNC Codes
 parameter ADD 	= 6'b100000; //ADD;
 parameter ADDU 	= 6'b100001; //ADDU;
 parameter SUB	= 6'b100010; //SUB;
 parameter SUBU	= 6'b100011; //SUBU;	
-parameter MULT	= 6'b011000; //MULT;		--
-parameter MULTU = 6'b011001; //MULTU;		--
-parameter DIV	= 6'b011010; //DIV;		--
-parameter DIVU 	= 6'b011011; //DIVU;		--
-parameter MFHI	= 6'b010000; //MFHI;		--
-parameter MFLO 	= 6'b010010; //MFLO;		--
+parameter MULT	= 6'b011000; //MULT;	
+parameter MULTU = 6'b011001; //MULTU;		
+parameter DIV	= 6'b011010; //DIV;		
+parameter DIVU 	= 6'b011011; //DIVU;		
+parameter MFHI	= 6'b010000; //MFHI;		
+parameter MFLO 	= 6'b010010; //MFLO;		
 parameter SLT	= 6'b101010; //SLT;
 parameter SLTU	= 6'b101011; //SLTU;
 parameter SLL	= 6'b000000; //SLL;
@@ -37,15 +24,15 @@ parameter AND	= 6'b100100; //AND;
 parameter OR	= 6'b100101; //OR;
 parameter XOR	= 6'b100110; //XOR;
 parameter NOR	= 6'b100111; //NOR
-parameter JALR	= 6'b001001; //JALR;		--
+parameter JALR	= 6'b001001; //JALR;		
 parameter JR	= 6'b001000; //JR;		
 
-// MUL R-TYPE INSN
-parameter MUL_OP = 6'b011100; //MUL OPCODE
-parameter MUL_FUNC = 6'b000010;  //MUL FUNCTION CODE
+// MUL R-TYPE Opcode
+parameter MUL_OP = 6'b011100; 	//MUL OPCODE
+parameter MUL_FUNC = 6'b000010; //MUL FUNCTION CODE
 
 // I-Type Opcodes
-parameter ADDI  = 6'b001000; //ADDI (Used for pseudoinstruction : LI)
+parameter ADDI  = 6'b001000; //ADDI (LI)
 parameter ADDIU = 6'b001001; //ADDIU
 parameter SLTI  = 6'b001010; //SLTI
 parameter SLTIU = 6'b001011; //SLTIU
@@ -62,6 +49,7 @@ parameter BNE	= 6'b000101; //BNE
 parameter BGTZ	= 6'b000111; //BGTZ
 parameter BLEZ	= 6'b000110; //BLEZ
 
+// REGIMM Opcodes
 parameter BLTZ = 5'b00000; // BLTZ
 parameter BGEZ = 5'b00001; // BGEZ 
 
@@ -69,9 +57,24 @@ parameter BGEZ = 5'b00001; // BGEZ
 parameter J     = 6'b000010;
 parameter JAL	= 6'b000011;
 
+// Other 
 parameter NOP   = 6'b000000;
+parameter RTYPE = 6'b000000;
+/******************************************/
 
-parameter RTYPE = 6'b000000; //R-Type INSN
+input clock;
+input [31:0] pc, insn, rsData, rtData;
+input [4:0]  saData;
+input [31:0] immSXData;
+input [5:0]  ALUOp;
+input wire enable_execute;
+
+reg [63:0] temp;
+reg [31:0] hi;
+reg [31:0] lo;
+
+output reg [31:0] dataOut;
+output reg branch_taken;
 
 always @(posedge clock)
 begin : EXECUTE
