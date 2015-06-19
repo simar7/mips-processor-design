@@ -131,7 +131,8 @@ begin : DECODE
 					ALUOp = func_out;
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
-					rdIn_regfile = rd_out;					
+					rdIn_regfile = rd_out;		
+					imm_out_sx[31:0] = 32'hx;		
 				end
 
 				ADDU: begin
@@ -145,6 +146,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				SUB: begin
@@ -158,6 +160,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				SUBU: begin
@@ -171,6 +174,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				MUL_FUNC: begin
@@ -185,6 +189,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end	
 
 				MULT: begin
@@ -198,6 +203,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				MULTU: begin
@@ -211,6 +217,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				DIV: begin
@@ -224,6 +231,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				DIVU: begin
@@ -237,6 +245,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				MFHI: begin
@@ -250,6 +259,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				MFLO: begin
@@ -263,6 +273,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				SLT: begin
@@ -276,6 +287,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				SLTU: begin
@@ -289,6 +301,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				SLL: begin
@@ -302,6 +315,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				SLLV: begin
@@ -315,6 +329,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				SRL: begin
@@ -328,6 +343,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				SRLV: begin
@@ -341,6 +357,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				SRA: begin
@@ -354,6 +371,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				SRAV: begin
@@ -367,6 +385,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				AND: begin
@@ -380,6 +399,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				OR: begin
@@ -393,6 +413,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				NOR: begin
@@ -406,6 +427,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				JALR: begin
@@ -419,6 +441,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 
 				JR: begin
@@ -432,6 +455,7 @@ begin : DECODE
 					rsIn_regfile = rs_out;
 					rtIn_regfile = rt_out;
 					rdIn_regfile = rd_out;	
+					imm_out_sx[31:0] = 32'hx;	
 				end
 			endcase
 		end else if (insn[31:26] != 6'b000000 && insn[31:27] != 5'b00001) begin
