@@ -608,7 +608,7 @@ always 	@(posedge clock) begin: POPULATE
 
 	
 	if (execute_not_enabled == 1 && (words_decoded > 0)) begin : ENABLEEXECUTE
-		enable_execute <= 1;
+		enable_execute = 1;
 		execute_not_enabled = 0;
 	end
 
@@ -624,7 +624,7 @@ always 	@(posedge clock) begin: POPULATE
 
 		words_executed <= words_executed + 1;
 		
-		if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_run < words_written)) begin
+		if((words_executed > 0) && (words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_run < words_written)) begin
 			words_run = words_run + 1;
 			$display("DATAOUT=%b", dataOut_execute_tb);
 		end
