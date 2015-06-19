@@ -8,4 +8,4 @@ vsim work.F_D_M_tb
 do pd3_watch.do
 do pd3_waveform.do
 # Run simulation
-run 10000
+run 500 
