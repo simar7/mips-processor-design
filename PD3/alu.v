@@ -1,10 +1,11 @@
-module alu(clock, pc, insn, rsData, rtData, saData, immSXData, ALUOp, dataOut);
+module alu(clock, enable_execute, pc, insn, rsData, rtData, saData, immSXData, ALUOp, dataOut);
 	
 input clock;
 input [31:0] pc, insn;
 input [4:0]  rsData, rtData, saData;
 input [31:0] immSXData;
 input [5:0]  ALUOp;
+input wire enable_execute;
 
 output reg [31:0] dataOut;
 
@@ -69,6 +70,7 @@ parameter RTYPE = 6'b000000; //R-Type INSN
 
 always @(posedge clock)
 begin : EXECUTE
+if (enable_execute) begin
 	if(insn[31:26] == RTYPE) begin
 		case (ALUOp)
 			ADD: begin
@@ -227,6 +229,7 @@ begin : EXECUTE
 			end
 		endcase
 	end	
+	end
 end
 	
 endmodule

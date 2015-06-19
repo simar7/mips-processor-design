@@ -75,6 +75,7 @@ reg rw;
 reg enable;
 reg enable_fetch;
 reg enable_decode;
+reg enable_execute;
 reg [31:0] pc_decode, insn_decode;
 reg [31:0] pc_execute, insn_execute, imm_execute;
 reg [4:0]  rsData_execute, rtData_execute, saData_execute;
@@ -188,6 +189,7 @@ decode D0 (
 // Instantiate the execute module.
 alu X0 (
 	.clock (clock),
+	.enable_execute (enable_execute),
 	.pc (pc_execute),
 	.insn (insn_execute),
 	.rsData (rsData_execute),
@@ -286,9 +288,9 @@ always 	@(posedge clock) begin: POPULATE
 		rtOut_regfile_tb = rtOut_regfile;
 		imm_out_sx_decode_tb = imm_out_sx_decode;
 
-		pc_from_decode_temp <= pc_decode;
+		pc_from_decode_temp <= pc_out;
 		pc_execute = pc_from_decode_temp;
-		insn_execute <= insn_decode;
+		insn_execute = insn_decode;
 
 		words_decoded <= words_decoded + 1;
 
@@ -606,10 +608,11 @@ always 	@(posedge clock) begin: POPULATE
 
 	
 	if (execute_not_enabled == 1 && (words_decoded > 0)) begin : ENABLEEXECUTE
+		enable_execute <= 1;
 		execute_not_enabled = 0;
 	end
 
-	if (execute_not_enabled == 0 && words_executed <= words_written) begin : EXECUTESTAGE		
+	if (enable_execute == 1 && execute_not_enabled == 0 && words_executed <= words_written) begin : EXECUTESTAGE		
 		// FIXME: timing might be off here.
 		dataOut_execute_tb = dataOut_execute;
 
