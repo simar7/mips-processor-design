@@ -144,6 +144,7 @@ reg [31:0] insn_out_tb;
 reg [31:0] dataOut_execute_tb;
 reg [31:0] pc_from_fetch_temp;
 reg [31:0] pc_from_decode_temp;
+reg [31:0] insn_execute_temp;
 reg [31:0] rsOut_regfile_tb;
 reg [31:0] rtOut_regfile_tb;
 reg [31:0] imm_out_sx_decode_tb;
@@ -298,7 +299,9 @@ always 	@(posedge clock) begin: POPULATE
 
 		pc_from_decode_temp <= pc_out;
 		pc_execute = pc_from_decode_temp;
-		insn_execute <= insn_decode;
+		insn_execute_temp <= insn_decode;
+		//insn_execute = insn_execute_temp;
+
 		enable_execute <= 1;
 
 		words_decoded <= words_decoded + 1;
@@ -627,11 +630,12 @@ always 	@(posedge clock) begin: POPULATE
 		// FIXME: timing might be off here.
 		dataOut_execute_tb = dataOut_execute;
 
-		rsData_execute = rsOut_regfile;
-		rtData_execute = rtOut_regfile;
-		saData_execute = sa_out;
-		imm_execute = imm_out_sx_decode;
-		ALUOp_execute = ALUOp_decode;
+		rsData_execute <= rsOut_regfile;
+		rtData_execute <= rtOut_regfile;
+		saData_execute <= sa_out;
+		imm_execute <= imm_out_sx_decode;
+		ALUOp_execute <= ALUOp_decode;
+		insn_execute <= insn_execute_temp;
 		dVal_regfile <= dataOut_execute;
 		we_regfile <= 0;
 
