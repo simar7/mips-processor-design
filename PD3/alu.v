@@ -1,5 +1,4 @@
-
-module alu(clock, pc, insn, rsData, rtData, saData, immSXData, ALUOp, dataOut, branch_taken);
+module alu(clock, pc, insn, rsData, rtData, saData, immSXData, ALUOp, dataOut, branch_taken, enable_execute);
 
 input clock;
 input [31:0] pc, insn;
@@ -298,7 +297,7 @@ if (enable_execute) begin
 			end
 		endcase
 	end	
-	end
+end
 end
 	
 endmodule
