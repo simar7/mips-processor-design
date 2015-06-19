@@ -609,7 +609,7 @@ always 	@(posedge clock) begin: POPULATE
 
 	
 	
-	if (words_decoded > 1) begin : ENABLEEXECUTE
+	if (words_decoded > 0) begin : ENABLEEXECUTE
 		enable_execute = 1;
 		execute_not_enabled = 0;
 		we_regfile = 1;
@@ -627,11 +627,11 @@ always 	@(posedge clock) begin: POPULATE
 		dVal_regfile <= dataOut_execute;
 		we_regfile = 0;
 
-		words_executed <= words_executed + 1;
+		words_executed = words_executed + 1;
 		
 		if((words_executed > 0) && (words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_run < words_written)) begin
 			words_run = words_run + 1;
-			$display("INSN=%x DATAOUT=%x", insn_execute, dataOut_execute_tb);
+			$display("INSN=%x ALUOp_execute=%b DATAOUT=%x", insn_execute, ALUOp_execute, dataOut_execute_tb);
 		end
 	end
 
