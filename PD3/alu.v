@@ -76,9 +76,9 @@ reg [31:0] lo;
 output reg [31:0] dataOut;
 output reg branch_taken;
 
-always @(posedge clock)
+always @(ALUOp, rsData, rtData)
 begin : EXECUTE
-if (enable_execute) begin
+//if (enable_execute) begin
 	if(insn[31:26] == RTYPE) begin
 		case (ALUOp)
 			ADD: begin
@@ -302,6 +302,6 @@ if (enable_execute) begin
 		endcase
 	end	
 end
-end
+//end
 	
 endmodule

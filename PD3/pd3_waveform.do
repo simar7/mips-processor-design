@@ -13,6 +13,7 @@ add wave -noupdate -radix hexadecimal /F_D_M_tb/decode_not_enabled
 add wave -noupdate -radix hexadecimal /F_D_M_tb/execute_not_enabled
 add wave -noupdate -radix hexadecimal /F_D_M_tb/rsOut_regfile
 add wave -noupdate -radix hexadecimal /F_D_M_tb/rtOut_regfile
+add wave -noupdate /F_D_M_tb/D0/rdIn_regfile
 add wave -noupdate -radix hexadecimal /F_D_M_tb/dVal_regfile
 add wave -noupdate -radix hexadecimal /F_D_M_tb/we_regfile
 add wave -noupdate -radix hexadecimal /F_D_M_tb/enable_decode
@@ -43,7 +44,7 @@ add wave -noupdate -radix hexadecimal /F_D_M_tb/dataOut_execute
 add wave -noupdate -radix hexadecimal /F_D_M_tb/stall
 add wave -noupdate -radix hexadecimal /F_D_M_tb/busy
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {206 ps} 0}
+WaveRestoreCursors {{Cursor 1} {101 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 340
 configure wave -valuecolwidth 100
@@ -59,4 +60,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {189 ps} {253 ps}
+WaveRestoreZoom {68 ps} {97 ps}

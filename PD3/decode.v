@@ -726,8 +726,8 @@ end
 // Clocked write of writeback data
 always @(posedge clock)
 begin: REG_WRITE
-	if (we_regfile) begin
-		REGFILE [rdIn_regfile] <= dVal_regfile;
+	if (we_regfile == 1) begin
+		REGFILE [rdIn_regfile] = dVal_regfile;
 	end
 end 
 
