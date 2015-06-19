@@ -110,6 +110,7 @@ wire [31:0] imm_out_sx_decode;
 wire rw_fetch;
 wire [31:0] access_size_fetch;
 wire [31:0] dataOut_execute;
+wire branch_taken_execute;
 wire [5:0] ALUOp_decode;
 
 
@@ -142,6 +143,7 @@ reg [25:0] imm_out_tb;
 reg [31:0] pc_out_tb;
 reg [31:0] insn_out_tb;
 reg [31:0] dataOut_execute_tb;
+reg branch_taken_tb;
 reg [31:0] pc_from_fetch_temp;
 reg [31:0] pc_from_decode_temp;
 reg [31:0] insn_execute_temp;
@@ -206,12 +208,13 @@ alu X0 (
 	.saData (saData_execute),
 	.ALUOp (ALUOp_execute),
 	.immSXData (imm_execute),
-	.dataOut (dataOut_execute)
+	.dataOut (dataOut_execute),
+	.branch_taken (branch_taken_execute)
 );
 	
 initial begin
 
-	fd = $fopen("SimpleAdd.x", "r");
+	fd = $fopen("SimpleIf.x", "r");
 	if (!fd)
 		$display("Could not open");
 
@@ -328,161 +331,161 @@ always 	@(posedge clock) begin: POPULATE
 				SUB: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tSUB RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				SUBU: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tSUBU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				MUL_FUNC: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin 
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tMUL RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 			
 				MULT: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tMULT RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				MULTU: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tMULTU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				DIV: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tDIV RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				DIVU: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin 
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tDIVU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				MFHI: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tMFHI RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				MFLO: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin 
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tMFLO RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				SLT: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin 
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tSLT RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				SLTU: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tSLTU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				SLL: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tSLL RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				SLLV: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tSLLV RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				SRL: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tSRL RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				SRLV: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tSRLV RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				SRA: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tSRA RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				SRAV: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tSRAV RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				AND: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tAND RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				OR: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tOR RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				XOR: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tXOR RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				NOR: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tNOR RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				JALR: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tJALR RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 	
 				JR: begin
 					if((words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_processed < words_written)) begin
 						words_processed = words_processed + 1;
-						$display("%x:\t%x\tADDU RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
+						$display("%x:\t%x\tJR RS=%b RT=%b RD=%b SA=%b rsOut_regfile=%b rtOut_regfile=%b", pc_out_tb, insn_out_tb, rs_out_tb, rt_out_tb, rd_out_tb, sa_out_tb, rsOut_regfile_tb, rtOut_regfile_tb);
 					end
 				end
 			endcase
@@ -629,6 +632,7 @@ always 	@(posedge clock) begin: POPULATE
 	if (enable_execute == 1 && execute_not_enabled == 0 && words_executed <= words_written) begin : EXECUTESTAGE		
 		// FIXME: timing might be off here.
 		dataOut_execute_tb = dataOut_execute;
+		branch_taken_tb = branch_taken_execute;
 
 		rsData_execute <= rsOut_regfile;
 		rtData_execute <= rtOut_regfile;
@@ -643,7 +647,7 @@ always 	@(posedge clock) begin: POPULATE
 		
 		if((words_executed > 0) && (words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_run < words_written)) begin
 			words_run = words_run + 1;
-			$display("INSN=%x ALUOp_execute=%b DATAOUT=%x", insn_execute, ALUOp_execute, dataOut_execute_tb);
+			$display("%x INSN=%x ALUOp_execute=%b DATAOUT=%x branch_taken=%b", pc_execute, insn_execute, ALUOp_execute, dataOut_execute_tb, branch_taken_tb);
 		end
 	end
 

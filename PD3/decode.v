@@ -464,7 +464,7 @@ begin : DECODE
 					imm_out_sx[31:0] = 32'hx;	
 				end
 			endcase
-		end else if (insn[31:26] != 6'b000000 && insn[31:27] != 5'b00001) begin
+		end else if (insn[31:26] != 6'b000000 && insn[31:27] != 5'b00001 && insn[31:26] != 6'b000001) begin
 			// Instruction is I-Type
 			// Further need to classify function (addiu, diviu, etc...)
 			case (insn[31:26])
@@ -678,6 +678,52 @@ begin : DECODE
 					rdIn_regfile = rt_out;
 					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
 				end
+
+				BLEZ: begin
+					opcode_out = BLEZ;
+					rs_out = insn[25:21];
+					rt_out = insn[20:16];
+					rd_out = 5'hx;
+					sa_out = 5'hx;
+					imm_out[25:10] = insn[15:0];
+					func_out = 6'hx;
+					ALUOp = BLEZ;
+					rsIn_regfile = rs_out;
+					rdIn_regfile = rt_out;
+					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
+				end
+	
+			endcase
+		end else if (insn[31:6] == 6'b000001) begin
+			// REGIMM
+			case (insn[20:16])
+				BLTZ: begin
+					opcode_out = BLTZ;
+					rs_out = insn[25:21];
+					rt_out = insn[20:16];
+					rd_out = 5'hx;
+					sa_out = 5'hx;
+					imm_out[25:10] = insn[15:0];
+					func_out = 6'hx;
+					ALUOp = BLTZ;
+					rsIn_regfile = rs_out;
+					rdIn_regfile = rt_out;
+					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
+				end
+
+				BGEZ: begin
+					opcode_out = BGEZ;
+					rs_out = insn[25:21];
+					rt_out = insn[20:16];
+					rd_out = 5'hx;
+					sa_out = 5'hx;
+					imm_out[25:10] = insn[15:0];
+					func_out = 6'hx;
+					ALUOp = BGEZ;
+					rsIn_regfile = rs_out;
+					rdIn_regfile = rt_out;
+					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
+				end
 			endcase
 		end else if (insn[31:27] == 5'b00001) begin
 			// Instruction is J-Type
@@ -693,7 +739,8 @@ begin : DECODE
 					ALUOp = J;
 					rsIn_regfile = imm_out;
 					rtIn_regfile = rt_out;
-					rdIn_regfile = rd_out;		
+					rdIn_regfile = rd_out;
+					imm_out_sx[31:0] <= { {6{1'b0}}, insn[25:0] };		
 				end
 
 				JAL: begin
@@ -707,7 +754,8 @@ begin : DECODE
 					ALUOp = JAL;
 					rsIn_regfile = imm_out;
 					rtIn_regfile = rt_out;
-					rdIn_regfile = rd_out;	
+					rdIn_regfile = rd_out;
+					imm_out_sx[31:0] <= { {6{1'b0}}, insn[25:0] };	
 				end
 			endcase
 		end else if (insn[31:0] == 32'h00000000) begin

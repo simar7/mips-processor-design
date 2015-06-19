@@ -182,6 +182,12 @@ begin : EXECUTE
 				dataOut = rsData;
 				branch_taken = 1;
 			end
+
+			JALR: begin
+				dataOut = (pc + 8);
+				//pc_out_execute = rsData
+				branch_taken = 1;
+			end
 		endcase
 	end else if (insn[31:26] != 6'b000000 && insn[31:27] != 5'b00001 && insn[31:26] != 6'b000001) begin
 		case (ALUOp)
@@ -281,7 +287,7 @@ begin : EXECUTE
 		endcase
 	end else if (insn[31:26] == 6'b000001) begin
 		// REGIMM
-		case(insn[20:16])
+		case(ALUOp)
 			BLTZ: begin
 				if (rsData < 0) begin
 					dataOut = pc + (immSXData[15:0] << 2);
@@ -300,7 +306,22 @@ begin : EXECUTE
 				end
 			end
 		endcase
-	end	
+	end else if (insn[31:27] == 5'b00001) begin
+		// J-Type
+		case (ALUOp)
+			J: begin
+				// 
+				dataOut[31:28] = pc[31:28];
+				dataOut[27:0] = immSXData[25:0] << 2;
+				branch_taken = 1;
+			end
+
+			JAL: begin
+				dataOut = pc + 8;
+				branch_taken = 1;
+			end
+		endcase
+	end
 end
 //end
 	
