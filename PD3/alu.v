@@ -1,4 +1,4 @@
-module alu(clock, pc, insn, rsData, rtData, saData, immSXData, ALUOp, dataOut);
+module alu(clock, pc, insn, rsData, rtData, saData, immSXData, ALUOp, dataOut, branch_taken);
 	
 input clock;
 input [31:0] pc, insn;
@@ -6,7 +6,12 @@ input [4:0]  rsData, rtData, saData;
 input [31:0] immSXData;
 input [5:0]  ALUOp;
 
+reg [63:0] temp;
+reg [31:0] hi;
+reg [31:0] lo;
+
 output reg [31:0] dataOut;
+output reg branch_taken;
 
 // R-Type FUNC Codes
 parameter ADD 	= 6'b100000; //ADD;
@@ -32,7 +37,7 @@ parameter OR	= 6'b100101; //OR;
 parameter XOR	= 6'b100110; //XOR;
 parameter NOR	= 6'b100111; //NOR
 parameter JALR	= 6'b001001; //JALR;		--
-parameter JR	= 6'b001000; //JR;		--
+parameter JR	= 6'b001000; //JR;		
 
 // MUL R-TYPE INSN
 parameter MUL_OP = 6'b011100; //MUL OPCODE
@@ -56,8 +61,8 @@ parameter BNE	= 6'b000101; //BNE
 parameter BGTZ	= 6'b000111; //BGTZ
 parameter BLEZ	= 6'b000110; //BLEZ
 
-parameter BLTZ = 6'bx; // TODO: implement this, uses some REGIMM opcode
-parameter BGEZ = 6'bx; // TODO: 
+parameter BLTZ = 5'b00000; // BLTZ
+parameter BGEZ = 5'b00001; // BGEZ 
 
 // J-Type Opcodes
 parameter J     = 6'b000010;
@@ -85,6 +90,31 @@ begin : EXECUTE
 
 			SUBU: begin
 				dataOut = rsData - rtData;
+			end
+
+			MUL_FUNC: begin
+				temp = rsData * rtData;
+				dataOut = temp[31:0];
+			end
+
+			DIV: begin
+				temp = rsData / rtData;
+				hi = temp[63:32];	// remainder
+				lo = temp[31:0];	// quotient
+			end
+
+			DIVU: begin
+				temp = rsData / rtData;
+				hi = temp[63:32];	// remainder
+				lo = temp[31:0];	// quotient
+			end
+
+			MFHI: begin
+				dataOut = hi;
+			end
+
+			MFLO: begin
+				dataOut = lo;
 			end
 
 			SLT: begin
@@ -142,8 +172,13 @@ begin : EXECUTE
 			NOR: begin
 				dataOut = ~(rsData | rtData);
 			end
+			
+			JR: begin
+				dataOut = rsData;
+				branch_taken = 1;
+			end
 		endcase
-	end else if (insn[31:26] != 6'b000000 && insn[31:27] != 5'b00001) begin
+	end else if (insn[31:26] != 6'b000000 && insn[31:27] != 5'b00001 && insn[31:26] != 6'b000001) begin
 		case (ALUOp)
 			ADDI: begin
 				dataOut = rsData + immSXData[15:0];
@@ -204,25 +239,58 @@ begin : EXECUTE
 
 			BEQ: begin
 		        	if (rsData == rtData) begin
-		        		dataOut = $signed(pc) + $signed(immSXData[15:0] << 2);
+		        		dataOut = pc + (immSXData[15:0] << 2);
+					branch_taken = 1;
+				end else begin
+					branch_taken = 0;
 				end
 			end
 
 			BNE: begin
 				if (rsData != rtData) begin
-					dataOut = $signed(pc) + $signed(immSXData[15:0] << 2);
+					dataOut = pc + (immSXData[15:0] << 2);
+					branch_taken = 1;
+				end else begin
+					branch_taken = 0;
 				end
 			end
 
 			BGTZ: begin
 				if (rsData > 0) begin
-					dataOut = $signed(pc) + $signed(immSXData[15:0] << 2);
+					dataOut = pc + (immSXData[15:0] << 2);
+					branch_taken = 1;
+				end else begin
+					branch_taken = 0;
 				end
 			end
 
 			BLEZ: begin
 				if (rsData <= 0) begin
-					dataOut = $signed(pc) + $signed(immSXData[15:0] << 2);
+					dataOut = pc + (immSXData[15:0] << 2);
+					branch_taken = 1;
+				end else begin
+					branch_taken = 0;
+				end
+			end
+		endcase
+	end else if (insn[31:26] == 6'b000001) begin
+		// REGIMM
+		case(insn[20:16])
+			BLTZ: begin
+				if (rsData < 0) begin
+					dataOut = pc + (immSXData[15:0] << 2);
+					branch_taken = 1;
+				end else begin
+					branch_taken = 0;
+				end
+			end
+
+			BGEZ: begin
+				if (rsData >= 0) begin
+			        	dataOut = pc + (immSXData[15:0] << 2);
+					branch_taken = 1;
+				end else begin
+					branch_taken = 0;
 				end
 			end
 		endcase
