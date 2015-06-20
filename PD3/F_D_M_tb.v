@@ -214,7 +214,7 @@ alu X0 (
 	
 initial begin
 
-	fd = $fopen("SimpleIf.x", "r");
+	fd = $fopen("SimpleAdd.x", "r");
 	if (!fd)
 		$display("Could not open");
 
@@ -301,7 +301,7 @@ always 	@(posedge clock) begin: POPULATE
 		imm_out_sx_decode_tb = imm_out_sx_decode;
 
 		pc_from_decode_temp <= pc_out;
-		pc_execute = pc_from_decode_temp;
+		//pc_execute = pc_from_decode_temp;
 		insn_execute_temp <= insn_decode;
 		//insn_execute = insn_execute_temp;
 
@@ -634,6 +634,7 @@ always 	@(posedge clock) begin: POPULATE
 		dataOut_execute_tb = dataOut_execute;
 		branch_taken_tb = branch_taken_execute;
 
+		pc_execute = pc_from_decode_temp;
 		rsData_execute <= rsOut_regfile;
 		rtData_execute <= rtOut_regfile;
 		saData_execute <= sa_out;
