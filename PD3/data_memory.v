@@ -41,7 +41,6 @@ integer read_total_words = 0;
 
 integer fd;
 integer status_read, status_write;
-integer blah;
 reg [31:0] fd_in;
 reg [31:0] str;
 

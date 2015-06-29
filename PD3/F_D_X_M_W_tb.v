@@ -1,4 +1,4 @@
-module F_D_M_tb;
+module F_D_X_M_W_tb;
 
 /****************OPCODES******************/
 // R-Type FUNC Codes

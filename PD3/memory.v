@@ -1,5 +1,4 @@
 // ECE 429
-//FIXME: include output port busy
 module memory(clock, address, data_in, access_size, rw, enable, busy, data_out);
 
 parameter data_width = 32;
@@ -42,7 +41,6 @@ integer read_total_words = 0;
 
 integer fd;
 integer status_read, status_write;
-integer blah;
 reg [31:0] fd_in;
 reg [31:0] str;
 
