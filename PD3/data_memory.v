@@ -1,6 +1,5 @@
 // ECE 429
-//FIXME: include output port busy
-module memory(clock, address, data_in, access_size, rw, enable, busy, data_out);
+module data_memory(clock, address, data_in, access_size, rw, enable, busy, data_out);
 
 parameter data_width = 32;
 parameter address_width = 32;
@@ -46,7 +45,7 @@ integer blah;
 reg [31:0] fd_in;
 reg [31:0] str;
 
-always @(posedge clock, data_in, rw)
+always @(posedge clock)
 begin : WRITE
 	// rw = 1
 	if ((!rw && enable)) begin
@@ -142,7 +141,7 @@ end
   11: 16 words (64-bytes)
 */
 
-always @(posedge clock, address, rw)
+always @(posedge clock)
 begin : READ
 	if ((rw && enable)) begin 
 		// busy is to be asserted in case of burst transactions.
