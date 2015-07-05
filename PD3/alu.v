@@ -253,7 +253,7 @@ begin : EXECUTE
 
 			LW: begin
 				// TODO: MEMTYPE
-				dm_we = 1;	//read from memory
+				dm_we = 0;	//read from memory
 				dm_access_size = 2'b0_0; // 1 WORD
 				rw_d = 1;	
 				
@@ -268,7 +268,7 @@ begin : EXECUTE
 				// TODO: MEMTYPE
 				dm_we = 1;
 				dm_access_size = 2'b0_0; // 1 WORD
-				rw_d = 1'bx; //writeback not needed
+				rw_d = 0;
 
 				// MEM[rs + SX(imm)] <= rt
 				// dataOut has MEM ADDR to store rt
