@@ -90,6 +90,14 @@ reg [5:0]  ALUOp_execute;
 reg we_regfile;
 reg stall;
 reg [31:0] dVal_regfile;
+reg [address_width-1:0] address_dm;
+reg [data_width-1:0] data_in_dm;
+reg [1:0] access_size_dm;
+reg rw_dm;
+reg enable_dm;
+reg [data_width-1:0] data_in_mem_wb;
+reg [data_width-1:0] data_in_alu_wb;
+reg rw_d_wb;
 
 // Output Ports
 wire busy;
@@ -112,6 +120,9 @@ wire [31:0] access_size_fetch;
 wire [31:0] dataOut_execute;
 wire branch_taken_execute;
 wire [5:0] ALUOp_decode;
+wire busy_dm;
+wire [data_width-1:0] data_out_dm;
+wire [data_width-1:0] data_out_wb;
 
 
 // fileIO stuff
@@ -211,7 +222,29 @@ alu X0 (
 	.dataOut (dataOut_execute),
 	.branch_taken (branch_taken_execute)
 );
-	
+
+// Instantiate the data memory module.
+data_memory DM0 (
+	.clock (clock),
+	.address (address_dm),
+	.data_in (data_in_dm),
+	.access_size (access_size_dm),
+	.rw (rw_dm),
+	.enable (enable_dm),
+	.busy (busy_dm),
+	.data_out (data_out_dm)
+);
+
+// Instantiate the writeback module.
+writeback WB0 (
+	.clock (clock),
+	.data_in_mem (data_in_mem_wb),
+	.data_in_alu (data_in_alu_wb),
+	.rw_d (rw_d_wb),
+	.data_out (data_out_wb)
+);
+
+
 initial begin
 
 	fd = $fopen("SimpleAdd.x", "r");
@@ -234,6 +267,7 @@ initial begin
 	fetch_not_enabled = 1;
 	decode_not_enabled = 1;
 	execute_not_enabled = 1;
+	enable_dm = 1;
 
 	stall = 0;
 end
@@ -245,12 +279,14 @@ always 	@(posedge clock) begin: POPULATE
 		scan_fd = $fscanf(fd, "%x", line);
 		if (!$feof(fd)) begin
 			data_in = line;
+			data_in_dm = line;
 			$display("line = %x", data_in);
 			address = address + 4;
 			words_written = words_written + 1;	
 		end
 		else begin: ENDWRITE
 			rw <= 1;
+			address_dm <= address + 4;
 			address <= 32'h80020000;
 			//enable_fetch <= 1;
 			stall = 0;
@@ -640,7 +676,7 @@ always 	@(posedge clock) begin: POPULATE
 		imm_execute <= imm_out_sx_decode;
 		ALUOp_execute <= ALUOp_decode;
 		insn_execute <= insn_execute_temp;
-		dVal_regfile <= dataOut_execute;
+		//dVal_regfile <= dataOut_execute;
 		we_regfile <= 0;
 
 		words_executed <= words_executed + 1;
@@ -654,6 +690,17 @@ always 	@(posedge clock) begin: POPULATE
 				$display("%x INSN=%x ALUOp_execute=%b DATAOUT=%x branch_taken=NA", pc_execute, insn_execute, ALUOp_execute, dataOut_execute_tb);
 			end
 		end
+	end
+
+
+	if (rw_dm == 1) begin: WRITEBACKDMEM
+		address_dm <= dataOut_execute;
+		data_in_dm <= rd_out;
+	end
+
+	if (rw_dm == 0 && rw_d_wb == 0) begin: WRITEBACKREGFILE
+		data_in_alu_wb <= dataOut_execute;
+		dVal_regfile <= data_out_wb;
 	end
 
 end
