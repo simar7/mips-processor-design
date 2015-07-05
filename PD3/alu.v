@@ -1,4 +1,4 @@
-module alu(clock, pc, insn, rsData, rtData, saData, immSXData, ALUOp, dataOut, branch_taken, enable_execute);
+module alu(clock, pc, insn, rsData, rtData, saData, immSXData, ALUOp, dataOut, branch_taken, enable_execute, dm_we, dm_access_size, rw_d);
 
 /****************OPCODES******************/
 // R-Type FUNC Codes
@@ -75,27 +75,46 @@ reg [31:0] lo;
 
 output reg [31:0] dataOut;
 output reg branch_taken;
+output reg dm_we;	// data memory write enable maps to we in memory module
+output reg rw_d;
+output reg dm_access_size;
 
 always @(ALUOp, rsData, rtData)
 begin : EXECUTE
 	branch_taken = 0;
-//if (enable_execute) begin
 	if(insn[31:26] == RTYPE) begin
 		case (ALUOp)
 			ADD: begin
+				//writeback dataOut to regfile, bypass DMem
+				//dataOut is data_in_alu in writeback
 				dataOut = rsData + rtData;
+				rw_d = 0;
+				dm_we = 0;	
 			end
 			
 			ADDU: begin
+				//writeback dataOut to regfile, bypass DMem
+				//dataOut is data_in_alu in writeback
 				dataOut = rsData + rtData;
+				rw_d = 0;
+				dm_we = 0;
 			end
 
 			SUB: begin
+				//writeback dataOut to regfile, bypass DMem
+				//dataOut is data_in_alu in writeback
 				dataOut = rsData - rtData;
+				rw_d = 0;
+				dm_we = 0;
+			
 			end
 
 			SUBU: begin
+				//writeback dataOut to regfile, bypass DMem
+				//dataOut is data_in_alu in writeback
 				dataOut = rsData - rtData;
+				rw_d = 0;
+				dm_we = 0;
 			end
 
 			MUL_FUNC: begin
@@ -184,7 +203,7 @@ begin : EXECUTE
 				branch_taken = 1;
 			end
 
-			JALR: begin
+			JALR: begin	
 				dataOut = (pc + 8);
 				//pc_out_execute = rsData
 				branch_taken = 1;
@@ -193,12 +212,19 @@ begin : EXECUTE
 	end else if (insn[31:26] != 6'b000000 && insn[31:27] != 5'b00001 && insn[31:26] != 6'b000001) begin
 		case (ALUOp)
 			ADDI: begin
+				//writeback dataOut to regfile, bypass DMem
+				//dataOut is data_in_alu in writeback
 				dataOut = rsData + immSXData[15:0];
+				rw_d = 0;	
+				dm_we = 0;
 			end
 
 			ADDIU: begin
+				//writeback dataOut to regfile, bypass DMem
+				//dataOut is data_in_alu in writeback
 				dataOut = rsData + immSXData[15:0];
-
+				rw_d = 0;	
+				dm_we = 0;
 			end
 
 			SLTI: begin
@@ -226,27 +252,54 @@ begin : EXECUTE
 			end
 
 			LW: begin
+				// TODO: MEMTYPE
+				dm_we = 1;	//read from memory
+				dm_access_size = 2'b0_0; // 1 WORD
+				rw_d = 1;	
+				
+				// rt <= MEM[rs + SX(imm,32)]
+				// dataOut MEM ADDR of data to load
+				// dataOut goes to input a of DMEM
+				// writeback mem contents at MEM[dataOut] to regfile
 				dataOut = rsData + immSXData[15:0];
 			end
 
 			SW: begin
+				// TODO: MEMTYPE
+				dm_we = 1;
+				dm_access_size = 2'b0_0; // 1 WORD
+				rw_d = 1'bx; //writeback not needed
+
+				// MEM[rs + SX(imm)] <= rt
+				// dataOut has MEM ADDR to store rt
+				// get rt straight from output of decode
+				// rt is input d of data memory
+				// dataOut is input a of data memory
+				// no writeback, disable regfile we
+				// store value of rt in MEM[dataOut]
+			
 				dataOut = rsData + immSXData[15:0];
 			end
 
 			LB: begin
+				// TODO: MEMTYPE (modify access size)
+				// First get LW to work, then do this
 				dataOut = rsData + immSXData[15:0];
 			end
 		
 			LUI: begin
+				// TODO: MEMTYPE
 				//dataOut = immSXData[15:0] << 16;
 				dataOut = {immSXData[15:0], 16'd0};
 			end
 
 			SB: begin
+				// TODO: MEMTYPE (modify access size)
 				dataOut = rsData + immSXData[15:0];
 			end
 			
 			LBU: begin
+				// TODO: MEMTYPE
 				dataOut = rsData + immSXData[15:0];
 			end
 
