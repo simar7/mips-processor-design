@@ -258,13 +258,17 @@ writeback WB0 (
 
 initial begin
 
-	fd = $fopen("SimpleAdd.x", "r");
+	fd = $fopen("SumArray.x", "r");
 	if (!fd)
 		$display("Could not open");
 
 	clock = 0;
 	address = start_addr;
-	scan_fd = $fscanf(fd, "%x", data_in);
+	address_dm = start_addr;
+
+	scan_fd = $fscanf(fd, "%x", data_in_dm);
+	data_in = data_in_dm;
+
 	access_size = 2'b0_0;
 	access_size_dm = 2'b0_0;
 	enable = 1;
@@ -280,7 +284,6 @@ initial begin
 	fetch_not_enabled = 1;
 	decode_not_enabled = 1;
 	execute_not_enabled = 1;
-	enable_dm = 1;
 
 	stall = 0;
 end
@@ -294,7 +297,8 @@ always 	@(posedge clock) begin: POPULATE
 		if (!$feof(fd)) begin
 			data_in = line;
 			data_in_dm = line;
-			$display("line = %x", data_in);
+			$display("(1)line = %x", data_in);
+			$display("(2)line = %x", data_in_dm);
 			address = address + 4;
 			address_dm = address_dm + 4;
 			words_written = words_written + 1;	
@@ -302,7 +306,7 @@ always 	@(posedge clock) begin: POPULATE
 		else begin: ENDWRITE
 			rw <= 1;
 			rw_dm <= 1;
-			address_dm <= address_dm + 4;
+			address_dm <= 32'h80020000;
 			address <= 32'h80020000;
 			//enable_fetch <= 1;
 			stall = 0;
