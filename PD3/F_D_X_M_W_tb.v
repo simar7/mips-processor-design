@@ -98,6 +98,7 @@ reg enable_dm;
 reg [data_width-1:0] data_in_mem_wb;
 reg [data_width-1:0] data_in_alu_wb;
 reg rw_d_wb;
+reg [4:0] rdIn_decode;
 
 // Output Ports
 wire busy;
@@ -162,6 +163,8 @@ reg [31:0] pc_from_fetch_temp;
 reg [31:0] pc_from_decode_temp;
 reg [31:0] insn_execute_temp;
 reg [31:0] insn_writeback_temp;
+reg [31:0] insn_writeback_temp_2;
+reg [4:0] rd_out_temp;
 reg [31:0] rsOut_regfile_tb;
 reg [31:0] rtOut_regfile_tb;
 reg [31:0] imm_out_sx_decode_tb;
@@ -208,7 +211,8 @@ decode D0 (
 	.rtOut_regfile (rtOut_regfile), 
 	.dVal_regfile  (dVal_regfile),
 	.we_regfile    (we_regfile),
-	.imm_out_sx    (imm_out_sx_decode)
+	.imm_out_sx    (imm_out_sx_decode),
+	.rdIn (rdIn_decode)
 );
 
 
@@ -334,6 +338,7 @@ always 	@(posedge clock) begin: POPULATE
 		rs_out_tb = rs_out;
 		rt_out_tb = rt_out;
 		rd_out_tb = rd_out;
+		//rd_out_temp <= rd_out_tb;
 		sa_out_tb = sa_out;
 		func_out_tb = func_out;
 		imm_out_tb = imm_out;
@@ -669,10 +674,10 @@ always 	@(posedge clock) begin: POPULATE
 	if (words_decoded > 0) begin : ENABLEEXECUTE
 		//enable_execute = 1;
 		execute_not_enabled = 0;
-		we_regfile <= 1;
+		we_regfile = 1;
 	end
 
-	if (enable_execute == 1 && execute_not_enabled == 0 && words_executed <= words_written) begin : EXECUTESTAGE		
+	if (enable_execute == 1 && execute_not_enabled == 0 && words_executed <= words_written + 1) begin : EXECUTESTAGE		
 		dataOut_execute_tb = dataOut_execute;
 		branch_taken_tb = branch_taken_execute;
 
@@ -684,8 +689,9 @@ always 	@(posedge clock) begin: POPULATE
 		ALUOp_execute <= ALUOp_decode;
 		insn_execute <= insn_execute_temp;
 		insn_writeback_temp <= insn_execute;
+		insn_writeback_temp_2 <= insn_writeback_temp;
 		//dVal_regfile <= dataOut_execute;
-		we_regfile <= 0;
+		//we_regfile <= 0;
 
 		words_executed <= words_executed + 1;
 		
@@ -725,6 +731,12 @@ always 	@(posedge clock) begin: POPULATE
 	end
 	
 	if (rw_d_wb == 0) begin: RWBFROMDM
+		if (insn_writeback_temp_2[31:26] == 000000) begin
+			rdIn_decode <= insn_writeback_temp_2[15:11];
+		end
+		else begin
+			rdIn_decode <= insn_writeback_temp_2[20:16];
+		end
 		dVal_regfile <= data_out_wb;
 	end
 

@@ -76,6 +76,8 @@ add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/opcode_out_tb
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/rs_out_tb
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/rt_out_tb
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/rd_out_tb
+add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/rd_out_temp
+add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/rdIn_decode
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/sa_out_tb
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/func_out_tb
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/imm_out_tb
@@ -87,11 +89,12 @@ add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/pc_from_fetch_temp
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/pc_from_decode_temp
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/insn_execute_temp
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/insn_writeback_temp
+add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/insn_writeback_temp_2
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/rsOut_regfile_tb
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/rtOut_regfile_tb
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/imm_out_sx_decode_tb
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {15 ps} 0}
+WaveRestoreCursors {{Cursor 1} {69 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 340
 configure wave -valuecolwidth 100
@@ -107,4 +110,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {25 ps} {151 ps}
+WaveRestoreZoom {0 ps} {126 ps}
