@@ -705,9 +705,9 @@ always 	@(posedge clock) begin: POPULATE
 	end
 
 	// not sw, not beq, not j
-	if (rw_dm == 0 && rw_d_wb == 0) begin: WRITEBACKREGFILE
+	if (dm_we_execute == 0 && rw_d_execute == 0) begin: RTYPE
 		data_in_alu_wb <= dataOut_execute;
-		dVal_regfile <= data_out_wb;
+		rw_d_wb <= 0;
 	end
 
 	if (dm_we_execute == 0 && rw_d_execute == 1) begin : LWDATAMEM
@@ -722,7 +722,11 @@ always 	@(posedge clock) begin: POPULATE
 		rw_d_wb <= 0;
 	end
 	
-	if (rw_d_wb == 1) begin: WBFROMDM
+	if (rw_d_wb == 0) begin: RWBFROMDM
+		dVal_regfile <= data_out_wb;
+	end
+
+	if (rw_d_wb == 1) begin: LWWBFROMDM
 		data_in_dm <= data_out_dm;
 	end
 
