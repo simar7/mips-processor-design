@@ -486,7 +486,7 @@ begin : DECODE
 					opcode_out = ADDIU;
 					rs_out = insn[25:21];
 					rt_out = insn[20:16];
-					rd_out = 5'hx;
+					rd_out = rt_out;
 					sa_out = 5'hx;
 					imm_out[25:10] = insn[15:0]; // Most significant 16-bits are immediate target
 					func_out = 6'hx;
