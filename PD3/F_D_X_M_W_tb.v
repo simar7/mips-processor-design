@@ -272,6 +272,7 @@ initial begin
 	access_size = 2'b0_0;
 	access_size_dm = 2'b0_0;
 	enable = 1;
+	enable_dm = 1;
 	rw = 0;		// Start writing first.
 	rw_dm = 0;	// Fill up the data mem.
 	words_read = 0;
@@ -290,8 +291,6 @@ end
 
 always 	@(posedge clock) begin: POPULATE
 	if (rw == 0) begin
-		enable = 1;
-		enable_dm = 1;
 		//rw = 0;
 		scan_fd = $fscanf(fd, "%x", line);
 		if (!$feof(fd)) begin
