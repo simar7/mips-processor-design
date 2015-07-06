@@ -266,8 +266,10 @@ initial begin
 	address = start_addr;
 	scan_fd = $fscanf(fd, "%x", data_in);
 	access_size = 2'b0_0;
+	access_size_dm = 2'b0_0;
 	enable = 1;
 	rw = 0;		// Start writing first.
+	rw_dm = 0;	// Fill up the data mem.
 	words_read = 0;
 	words_written = 1;
 	words_fetched = 0;
@@ -286,6 +288,7 @@ end
 always 	@(posedge clock) begin: POPULATE
 	if (rw == 0) begin
 		enable = 1;
+		enable_dm = 1;
 		//rw = 0;
 		scan_fd = $fscanf(fd, "%x", line);
 		if (!$feof(fd)) begin
@@ -293,11 +296,13 @@ always 	@(posedge clock) begin: POPULATE
 			data_in_dm = line;
 			$display("line = %x", data_in);
 			address = address + 4;
+			address_dm = address_dm + 4;
 			words_written = words_written + 1;	
 		end
 		else begin: ENDWRITE
 			rw <= 1;
-			address_dm <= address + 4;
+			rw_dm <= 1;
+			address_dm <= address_dm + 4;
 			address <= 32'h80020000;
 			//enable_fetch <= 1;
 			stall = 0;
@@ -721,8 +726,8 @@ always 	@(posedge clock) begin: POPULATE
 	end
 
 	if (dm_we_execute == 0 && rw_d_execute == 1) begin : LWDATAMEM
+		rw_dm = 1;
 		address_dm = dataOut_execute;
-		
 		data_in_mem_wb <= data_out_dm;
 		rdIn_decode <= insn_writeback_temp_2[20:16];
 		dVal_regfile <= data_out_wb;
@@ -730,6 +735,7 @@ always 	@(posedge clock) begin: POPULATE
 	end
 		
 	if (dm_we_execute == 1 && rw_d_execute == 0) begin : SWDATAMEM
+		rw_dm = 0;
 		address_dm = dataOut_execute;
 		// todo: add another pipeline reg for rtData_execute
 		data_in_dm = rtData_execute;
