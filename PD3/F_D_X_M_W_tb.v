@@ -145,8 +145,6 @@ integer fetch_not_enabled;
 integer decode_not_enabled;
 integer execute_not_enabled;
 
-integer stall_count;
-
 reg [31:0] line;
 
 // testbench registers
@@ -289,7 +287,6 @@ initial begin
 	execute_not_enabled = 1;
 
 	stall = 0;
-	stall_count = 0;
 end
 
 always 	@(posedge clock) begin: POPULATE
@@ -756,17 +753,8 @@ always 	@(posedge clock) begin: POPULATE
 		end
 		dVal_regfile = data_out_wb;
 	end
-	
-	if (stall_count == 5) begin
-		stall_count = 0;
-		stall = 0;
-	end else begin
-		stall = 1;
-		stall_count = stall_count + 1;
-	end
 
 end
-
 
 always
 	#5 clock = ! clock;
