@@ -1,6 +1,6 @@
 module decode(clock, insn, pc, opcode_out, rs_out, rt_out, rd_out,
 	sa_out, func_out, imm_out, enable_decode, pc_out,
-	insn_out, ALUOp, rsOut_regfile, rtOut_regfile, dVal_regfile, we_regfile, imm_out_sx);
+	insn_out, ALUOp, rsOut_regfile, rtOut_regfile, dVal_regfile, we_regfile, imm_out_sx, rdIn);
 
 /****************OPCODES******************/
 // R-Type FUNC Codes
@@ -72,6 +72,7 @@ input wire clock;
 input wire [31:0] insn;
 input wire [31:0] pc;
 input wire enable_decode;
+input wire [4:0] rdIn;
 
 // Registers
 reg [31:0] pc_reg;
@@ -775,7 +776,7 @@ end
 always @(posedge clock)
 begin: REG_WRITE
 	if (we_regfile == 1) begin
-		REGFILE [rdIn_regfile] = dVal_regfile;
+		REGFILE [rdIn] = dVal_regfile;
 	end
 end 
 
