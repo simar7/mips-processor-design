@@ -707,10 +707,12 @@ always 	@(posedge clock) begin: POPULATE
 	end
 
 
+	/*
 	if (rw_dm == 1) begin: WRITEBACKDMEM
 		address_dm = dataOut_execute;
 		data_in_dm = rd_out;
 	end
+	*/
 
 	// not sw, not beq, not j
 	if (dm_we_execute == 0 && rw_d_execute == 0) begin: RTYPE
@@ -720,6 +722,10 @@ always 	@(posedge clock) begin: POPULATE
 
 	if (dm_we_execute == 0 && rw_d_execute == 1) begin : LWDATAMEM
 		address_dm = dataOut_execute;
+		
+		data_in_mem_wb <= data_out_dm;
+		rdIn_decode <= insn_writeback_temp_2[20:16];
+		dVal_regfile <= data_out_wb;
 		rw_d_wb = 1;
 	end
 		
@@ -738,10 +744,6 @@ always 	@(posedge clock) begin: POPULATE
 			rdIn_decode = insn_writeback_temp_2[20:16];
 		end
 		dVal_regfile = data_out_wb;
-	end
-
-	if (rw_d_wb == 1) begin: LWWBFROMDM
-		data_in_dm = data_out_dm;
 	end
 
 end
