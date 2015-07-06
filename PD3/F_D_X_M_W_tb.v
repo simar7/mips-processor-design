@@ -708,40 +708,40 @@ always 	@(posedge clock) begin: POPULATE
 
 
 	if (rw_dm == 1) begin: WRITEBACKDMEM
-		address_dm <= dataOut_execute;
-		data_in_dm <= rd_out;
+		address_dm = dataOut_execute;
+		data_in_dm = rd_out;
 	end
 
 	// not sw, not beq, not j
 	if (dm_we_execute == 0 && rw_d_execute == 0) begin: RTYPE
-		data_in_alu_wb <= dataOut_execute;
-		rw_d_wb <= 0;
+		data_in_alu_wb = dataOut_execute;
+		rw_d_wb = 0;
 	end
 
 	if (dm_we_execute == 0 && rw_d_execute == 1) begin : LWDATAMEM
 		address_dm = dataOut_execute;
-		rw_d_wb <= 1;
+		rw_d_wb = 1;
 	end
 		
 	if (dm_we_execute == 1 && rw_d_execute == 0) begin : SWDATAMEM
 		address_dm = dataOut_execute;
 		// todo: add another pipeline reg for rtData_execute
-		data_in_dm <= rtData_execute;
-		rw_d_wb <= 0;
+		data_in_dm = rtData_execute;
+		rw_d_wb = 0;
 	end
 	
 	if (rw_d_wb == 0) begin: RWBFROMDM
-		if (insn_writeback_temp_2[31:26] == 000000) begin
-			rdIn_decode <= insn_writeback_temp_2[15:11];
+		if (insn_writeback_temp_2[31:26] == 000000) begin	//RTYPE insn
+			rdIn_decode = insn_writeback_temp_2[15:11];
 		end
 		else begin
-			rdIn_decode <= insn_writeback_temp_2[20:16];
+			rdIn_decode = insn_writeback_temp_2[20:16];
 		end
-		dVal_regfile <= data_out_wb;
+		dVal_regfile = data_out_wb;
 	end
 
 	if (rw_d_wb == 1) begin: LWWBFROMDM
-		data_in_dm <= data_out_dm;
+		data_in_dm = data_out_dm;
 	end
 
 end
