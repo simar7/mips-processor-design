@@ -115,7 +115,6 @@ begin
 	for (i_regfile = 0; i_regfile < NUM_REGS; i_regfile = i_regfile + 1) begin
 		REGFILE[i_regfile] = i_regfile;
 	end
-	REGFILE[29] = 32'h80120000;	// stack pointer
 end
 
 always @(posedge clock)

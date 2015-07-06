@@ -146,7 +146,6 @@ integer decode_not_enabled;
 integer execute_not_enabled;
 
 integer stall_count;
-integer stage_count;
 
 reg [31:0] line;
 
@@ -171,8 +170,6 @@ reg [4:0] rd_out_temp;
 reg [31:0] rsOut_regfile_tb;
 reg [31:0] rtOut_regfile_tb;
 reg [31:0] imm_out_sx_decode_tb;
-reg [31:0] sp;
-reg [31:0] ra;
 
 // Instantiate the memory module.
 memory M0 (
@@ -263,7 +260,7 @@ writeback WB0 (
 
 initial begin
 
-	fd = $fopen("SimpleAdd.x", "r");
+	fd = $fopen("SumArray.x", "r");
 	if (!fd)
 		$display("Could not open");
 
@@ -293,7 +290,6 @@ initial begin
 
 	stall = 0;
 	stall_count = 0;
-	stage_count = 0;
 end
 
 always 	@(posedge clock) begin: POPULATE
@@ -312,10 +308,8 @@ always 	@(posedge clock) begin: POPULATE
 		else begin: ENDWRITE
 			rw <= 1;
 			rw_dm <= 1;
-			address_dm <= 32'h80120000;
+			address_dm <= 32'h80020000;
 			address <= 32'h80020000;
-			sp <= 32'h80120000;
-			ra <= 32'hdeadbeef;
 			//enable_fetch <= 1;
 			stall = 0;
 		end
@@ -332,16 +326,10 @@ always 	@(posedge clock) begin: POPULATE
 
 	if (enable_fetch && (words_fetched <= words_written)) begin : FETCHSTAGE
 		address = pc_fetch;
+		insn_decode <= data_out;
 		pc_from_fetch_temp <= pc_fetch;
 		pc_decode = pc_from_fetch_temp;
-		if (stall == 0) begin
-			words_fetched <= words_fetched + 1;
-			insn_decode <= data_out;
-		end
-		if (stall == 1) begin
-			insn_decode <= 32'h00000000;
-		end
-		stage_count = stage_count + 1;
+		words_fetched <= words_fetched + 1;
 		//enable_decode <= 1;
 	end
 
@@ -370,7 +358,6 @@ always 	@(posedge clock) begin: POPULATE
 		rsOut_regfile_tb = rsOut_regfile;
 		rtOut_regfile_tb = rtOut_regfile;
 		imm_out_sx_decode_tb = imm_out_sx_decode;
-		stage_count = stage_count + 1;
 
 		pc_from_decode_temp <= pc_out;
 		//pc_execute = pc_from_decode_temp;
@@ -379,9 +366,7 @@ always 	@(posedge clock) begin: POPULATE
 
 		enable_execute <= 1;
 
-		if (stall == 0) begin
-			words_decoded <= words_decoded + 1;
-		end
+		words_decoded <= words_decoded + 1;
 
 		if (opcode_out_tb == 6'b000000 && rs_out_tb == 5'b00000 && rt_out_tb == 5'b00000 && rd_out_tb == 5'b00000 && sa_out_tb == 5'b00000 && func_out_tb == 6'b000000) begin
 			$display("%x:\t%x\tNOP", pc_out_tb, insn_out_tb);
@@ -716,13 +701,10 @@ always 	@(posedge clock) begin: POPULATE
 		insn_execute <= insn_execute_temp;
 		insn_writeback_temp <= insn_execute;
 		insn_writeback_temp_2 <= insn_writeback_temp;
-		stage_count = stage_count + 1;
 		//dVal_regfile <= dataOut_execute;
 		//we_regfile <= 0;
 
-		if (stall == 0) begin
-			words_executed <= words_executed + 1;
-		end
+		words_executed <= words_executed + 1;
 		
 		if((words_executed > 0) && (words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_run < words_written)) begin
 			words_run = words_run + 1;
@@ -747,7 +729,6 @@ always 	@(posedge clock) begin: POPULATE
 	if (dm_we_execute == 0 && rw_d_execute == 0) begin: RTYPE
 		data_in_alu_wb = dataOut_execute;
 		rw_d_wb = 0;
-		stage_count = stage_count + 1;
 	end
 
 	if (dm_we_execute == 0 && rw_d_execute == 1) begin : LWDATAMEM
@@ -757,58 +738,30 @@ always 	@(posedge clock) begin: POPULATE
 		rdIn_decode <= insn_writeback_temp_2[20:16];
 		dVal_regfile <= data_out_wb;
 		rw_d_wb = 1;
-		stage_count = stage_count + 1;
 	end
 		
 	if (dm_we_execute == 1 && rw_d_execute == 0) begin : SWDATAMEM
 		rw_dm = 0;
 		address_dm = dataOut_execute;
-		data_in_dm = { {27{1'b0}}, insn_writeback_temp_2[20:16]};
+		data_in_dm = rtData_execute;
 		rw_d_wb = 0;
-		stage_count = stage_count + 1;
 	end
 	
-	if (rw_d_wb == 0 && stall == 0) begin: RWBFROMDM
+	if (rw_d_wb == 0) begin: RWBFROMDM
 		if (insn_writeback_temp_2[31:26] == 000000) begin	//RTYPE insn
 			rdIn_decode = insn_writeback_temp_2[15:11];
-			if (rdIn_decode == 2'h1d) begin
-				sp <= sp + insn_writeback_temp_2[20:16];
-			end
 		end
 		else begin
 			rdIn_decode = insn_writeback_temp_2[20:16];
-			if (rdIn_decode == 2'h1d) begin
-				sp <= sp + insn_writeback_temp_2[15:0];
-			end
 		end
 		dVal_regfile = data_out_wb;
-		stage_count = stage_count + 2;
-		//stall <= 1;
 	end
-
-	if (stage_count >= 6) begin
-		stall = 1;
-		//stall_count = stall_count + 1;
-		stage_count = 0;
-		
-
-		// flush pipeline registers
-		data_in_alu_wb = 32'h00000000;
-		data_in_mem_wb = 32'h00000000;
-		insn_writeback_temp = 32'h00000000;
-		insn_writeback_temp_2 <= 32'h00000000;
-		pc_from_fetch_temp <= 32'h00000000;
-		pc_from_decode_temp <= 32'h00000000;
-		insn_execute_temp <= 32'h00000000;
-
-	end
-
-	if (stall_count >= 2) begin
+	
+	if (stall_count == 5) begin
 		stall_count = 0;
 		stall = 0;
-		we_regfile = 1;
 	end else begin
-		we_regfile = 0;
+		stall = 1;
 		stall_count = stall_count + 1;
 	end
 
