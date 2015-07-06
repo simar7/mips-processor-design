@@ -123,6 +123,9 @@ wire [5:0] ALUOp_decode;
 wire busy_dm;
 wire [data_width-1:0] data_out_dm;
 wire [data_width-1:0] data_out_wb;
+wire dm_we_execute;
+wire rw_d_execute;
+wire dm_access_size_execute;
 
 
 // fileIO stuff
@@ -220,7 +223,10 @@ alu X0 (
 	.ALUOp (ALUOp_execute),
 	.immSXData (imm_execute),
 	.dataOut (dataOut_execute),
-	.branch_taken (branch_taken_execute)
+	.branch_taken (branch_taken_execute),
+	.dm_we	(dm_we_execute),
+	.dm_access_size	(dm_access_size_execute),
+	.rw_d	(rw_d_execute)
 );
 
 // Instantiate the data memory module.
@@ -698,9 +704,26 @@ always 	@(posedge clock) begin: POPULATE
 		data_in_dm <= rd_out;
 	end
 
+	// not sw, not beq, not j
 	if (rw_dm == 0 && rw_d_wb == 0) begin: WRITEBACKREGFILE
 		data_in_alu_wb <= dataOut_execute;
 		dVal_regfile <= data_out_wb;
+	end
+
+	if (dm_we_execute == 0 && rw_d_execute == 1) begin : LWDATAMEM
+		address_dm = dataOut_execute;
+		rw_d_wb <= 1;
+	end
+		
+	if (dm_we_execute == 1 && rw_d_execute == 0) begin : SWDATAMEM
+		address_dm = dataOut_execute;
+		// todo: add another pipeline reg for rtData_execute
+		data_in_dm <= rtData_execute;
+		rw_d_wb <= 0;
+	end
+	
+	if (rw_d_wb == 1) begin: WBFROMDM
+		data_in_dm <= data_out_dm;
 	end
 
 end
