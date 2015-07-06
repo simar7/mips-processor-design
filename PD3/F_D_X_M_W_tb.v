@@ -740,7 +740,6 @@ always 	@(posedge clock) begin: POPULATE
 	if (dm_we_execute == 1 && rw_d_execute == 0) begin : SWDATAMEM
 		rw_dm = 0;
 		address_dm = dataOut_execute;
-		// todo: add another pipeline reg for rtData_execute
 		data_in_dm = rtData_execute;
 		rw_d_wb = 0;
 	end
