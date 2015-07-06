@@ -755,11 +755,7 @@ always 	@(posedge clock) begin: POPULATE
 		address_dm = dataOut_execute;
 		data_in_mem_wb <= data_out_dm;
 		rdIn_decode <= insn_writeback_temp_2[20:16];
-		if (stall == 0) begin
-			dVal_regfile <= data_out_wb;
-		end else begin
-			dVal_regfile <= 32'h00000000;
-		end
+		dVal_regfile <= data_out_wb;
 		rw_d_wb = 1;
 		stage_count = stage_count + 1;
 	end
@@ -785,18 +781,14 @@ always 	@(posedge clock) begin: POPULATE
 				sp <= sp + insn_writeback_temp_2[15:0];
 			end
 		end
-		if (stall == 0) begin
-			dVal_regfile = data_out_wb;
-		end else begin
-			dVal_regfile = 32'h00000000;
-		end
+		dVal_regfile = data_out_wb;
 		stage_count = stage_count + 2;
 		//stall <= 1;
 	end
 
 	if (stage_count >= 6) begin
 		stall = 1;
-		stall_count = stall_count + 1;
+		//stall_count = stall_count + 1;
 		stage_count = 0;
 		
 
@@ -804,27 +796,19 @@ always 	@(posedge clock) begin: POPULATE
 		data_in_alu_wb = 32'h00000000;
 		data_in_mem_wb = 32'h00000000;
 		insn_writeback_temp = 32'h00000000;
-		insn_writeback_temp_2 = 32'h00000000;
+		insn_writeback_temp_2 <= 32'h00000000;
 		pc_from_fetch_temp <= 32'h00000000;
 		pc_from_decode_temp <= 32'h00000000;
 		insn_execute_temp <= 32'h00000000;
-		if (we_regfile == 0) begin
-			dVal_regfile = 32'h00000000;
-		end else begin
-			//dVal_regfile = data_out_wb;
-		end
-		we_regfile = 0;
-		//dVal_regfile = data_out_wb;
+
 	end
 
 	if (stall_count >= 2) begin
 		stall_count = 0;
 		stall = 0;
 		we_regfile = 1;
-		dVal_regfile <= data_out_wb;
 	end else begin
 		we_regfile = 0;
-		dVal_regfile = 32'h00000000;
 		stall_count = stall_count + 1;
 	end
 
