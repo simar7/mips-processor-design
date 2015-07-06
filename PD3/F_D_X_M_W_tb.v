@@ -161,6 +161,7 @@ reg branch_taken_tb;
 reg [31:0] pc_from_fetch_temp;
 reg [31:0] pc_from_decode_temp;
 reg [31:0] insn_execute_temp;
+reg [31:0] insn_writeback_temp;
 reg [31:0] rsOut_regfile_tb;
 reg [31:0] rtOut_regfile_tb;
 reg [31:0] imm_out_sx_decode_tb;
@@ -682,6 +683,7 @@ always 	@(posedge clock) begin: POPULATE
 		imm_execute <= imm_out_sx_decode;
 		ALUOp_execute <= ALUOp_decode;
 		insn_execute <= insn_execute_temp;
+		insn_writeback_temp <= insn_execute;
 		//dVal_regfile <= dataOut_execute;
 		we_regfile <= 0;
 
