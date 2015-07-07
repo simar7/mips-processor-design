@@ -99,6 +99,7 @@ reg [data_width-1:0] data_in_mem_wb;
 reg [data_width-1:0] data_in_alu_wb;
 reg rw_d_wb;
 reg [4:0] rdIn_decode;
+reg enable_data_write_dm;
 
 // Output Ports
 wire busy;
@@ -127,6 +128,8 @@ wire [data_width-1:0] data_out_wb;
 wire dm_we_execute;
 wire rw_d_execute;
 wire dm_access_size_execute;
+wire mem_enable_fetch;
+wire [31:0] pc_backup_fetch;
 
 
 // fileIO stuff
@@ -144,6 +147,7 @@ integer words_processed;
 integer fetch_not_enabled;
 integer decode_not_enabled;
 integer execute_not_enabled;
+integer stall_count;
 
 reg [31:0] line;
 
@@ -188,7 +192,9 @@ fetch F0 (
 	.rw (rw_fetch),
 	.stall (stall),
 	.access_size (access_size_fetch),
-	.enable_fetch (enable_fetch)
+	.enable_fetch (enable_fetch),
+	.mem_enable (mem_enable_fetch),
+	.pc_backup (pc_backup_fetch)
 );
 
 // Instantiate the decode module.
@@ -243,7 +249,8 @@ data_memory DM0 (
 	.rw (rw_dm),
 	.enable (enable_dm),
 	.busy (busy_dm),
-	.data_out (data_out_dm)
+	.data_out (data_out_dm),
+	.enable_data_write (enable_data_write_dm)
 );
 
 // Instantiate the writeback module.
@@ -258,7 +265,7 @@ writeback WB0 (
 
 initial begin
 
-	fd = $fopen("SumArray.x", "r");
+	fd = $fopen("SimpleAdd.x", "r");
 	if (!fd)
 		$display("Could not open");
 
@@ -287,9 +294,21 @@ initial begin
 	execute_not_enabled = 1;
 
 	stall = 0;
+	stall_count = 0;
+end
+
+always @(posedge clock) begin
+	if (stall_count == 0) begin
+		stall = 0;
+		//enable = 1;
+	end else begin
+		stall = 1;
+		//enable = 0;
+	end
 end
 
 always 	@(posedge clock) begin: POPULATE
+
 	if (rw == 0) begin
 		//rw = 0;
 		scan_fd = $fscanf(fd, "%x", line);
@@ -305,13 +324,14 @@ always 	@(posedge clock) begin: POPULATE
 		else begin: ENDWRITE
 			rw <= 1;
 			rw_dm <= 1;
-			address_dm <= 32'h80020000;
+			address_dm <= 32'h80120000;
 			address <= 32'h80020000;
+			enable_data_write_dm = 1;
 			//enable_fetch <= 1;
-			stall = 0;
+			//stall = 0;
 		end
 	end
-	
+
 	
 	if (rw == 1 && fetch_not_enabled == 1) begin : ENABLEFETCH
 		//address <= 32'h80020000;
@@ -326,7 +346,9 @@ always 	@(posedge clock) begin: POPULATE
 		insn_decode <= data_out;
 		pc_from_fetch_temp <= pc_fetch;
 		pc_decode = pc_from_fetch_temp;
-		words_fetched <= words_fetched + 1;
+		if (stall == 0) begin
+			words_fetched <= words_fetched + 1;
+		end
 		//enable_decode <= 1;
 	end
 
@@ -363,7 +385,9 @@ always 	@(posedge clock) begin: POPULATE
 
 		enable_execute <= 1;
 
-		words_decoded <= words_decoded + 1;
+		if (stall == 0) begin
+			words_decoded <= words_decoded + 1;
+		end
 
 		if (opcode_out_tb == 6'b000000 && rs_out_tb == 5'b00000 && rt_out_tb == 5'b00000 && rd_out_tb == 5'b00000 && sa_out_tb == 5'b00000 && func_out_tb == 6'b000000) begin
 			$display("%x:\t%x\tNOP", pc_out_tb, insn_out_tb);
@@ -701,7 +725,9 @@ always 	@(posedge clock) begin: POPULATE
 		//dVal_regfile <= dataOut_execute;
 		//we_regfile <= 0;
 
-		words_executed <= words_executed + 1;
+		if (stall == 0) begin
+			words_executed <= words_executed + 1;
+		end
 		
 		if((words_executed > 0) && (words_decoded > 0) && (words_fetched > 0) && enable_fetch && enable_decode && (words_run < words_written)) begin
 			words_run = words_run + 1;
@@ -726,6 +752,7 @@ always 	@(posedge clock) begin: POPULATE
 	if (dm_we_execute == 0 && rw_d_execute == 0) begin: RTYPE
 		data_in_alu_wb = dataOut_execute;
 		rw_d_wb = 0;
+		//we_regfile = 1;
 	end
 
 	if (dm_we_execute == 0 && rw_d_execute == 1) begin : LWDATAMEM
@@ -734,26 +761,38 @@ always 	@(posedge clock) begin: POPULATE
 		data_in_mem_wb <= data_out_dm;
 		rdIn_decode <= insn_writeback_temp_2[20:16];
 		dVal_regfile <= data_out_wb;
-		rw_d_wb = 1;
+		rw_d_wb = 0;
+		//we_regfile = 1;
 	end
 		
 	if (dm_we_execute == 1 && rw_d_execute == 0) begin : SWDATAMEM
 		rw_dm = 0;
 		address_dm = dataOut_execute;
-		data_in_dm = rtData_execute;
-		rw_d_wb = 0;
+		//data_in_dm = rtData_execute;
+		data_in_dm <= { {26{1'b0}}, insn_writeback_temp_2[20:16]};
+		//ata_in_dm = insn_writeback_temp[20:16];
+		//rw_d_wb <= 0;
+		we_regfile = 0;
+		rw_d_wb = 1;
 	end
 	
 	if (rw_d_wb == 0) begin: RWBFROMDM
 		if (insn_writeback_temp_2[31:26] == 000000) begin	//RTYPE insn
 			rdIn_decode = insn_writeback_temp_2[15:11];
+			we_regfile = 1;
 		end
 		else begin
 			rdIn_decode = insn_writeback_temp_2[20:16];
+			we_regfile = 1;
 		end
 		dVal_regfile = data_out_wb;
 	end
 
+	stall_count = stall_count  + 1;
+	if (stall_count == 5) begin
+		stall_count = 0;
+		//insn_count = insn_count + 1;
+	end
 end
 
 always

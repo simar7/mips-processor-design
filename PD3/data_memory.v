@@ -1,5 +1,5 @@
 // ECE 429
-module data_memory(clock, address, data_in, access_size, rw, enable, busy, data_out);
+module data_memory(clock, address, data_in, access_size, rw, enable, busy, data_out, enable_data_write);
 
 parameter data_width = 32;
 parameter address_width = 32;
@@ -9,7 +9,7 @@ parameter depth = 1048576;
 parameter bytes_in_word = 4-1;
 parameter bits_in_bytes = 8-1;
 parameter BYTE = 8;
-parameter start_addr = 32'h80020000;
+reg [31:0] start_addr = 32'h80020000;
 
 // Input Ports
 input clock;
@@ -18,6 +18,7 @@ input [data_width-1:0] data_in;
 input [1:0] access_size;
 input rw;
 input enable;
+input enable_data_write;
 
 // Output Ports
 //FIXME: change to output port.
@@ -44,6 +45,12 @@ integer status_read, status_write;
 reg [31:0] fd_in;
 reg [31:0] str;
 
+always @(posedge clock) begin
+	if (enable_data_write == 1) begin
+		start_addr = 32'h80120000;
+	end
+end
+
 always @(posedge clock)
 begin : WRITE
 	// rw = 1
@@ -59,10 +66,17 @@ begin : WRITE
 		end
 		// 00: 1 word
         	if (access_size == 2'b0_0 ) begin
-			mem[address-start_addr+3] <= data_in[7:0];
-			mem[address-start_addr+2] <= data_in[15:8];
-			mem[address-start_addr+1] <= data_in[23:16];
-			mem[address-start_addr] <= data_in[31:24];	
+			if (enable_data_write == 1) begin
+				mem[start_addr-address+3] <= data_in[7:0];
+				mem[start_addr-address+2] <= data_in[15:8];
+				mem[start_addr-address+1] <= data_in[23:16];
+				mem[start_addr-address] <= data_in[31:24];
+			end else begin
+				mem[address-start_addr+3] <= data_in[7:0];
+				mem[address-start_addr+2] <= data_in[15:8];
+				mem[address-start_addr+1] <= data_in[23:16];
+				mem[address-start_addr] <= data_in[31:24];
+			end
 		end
 		// 01: 4 words
 		else if (access_size == 2'b0_1) begin

@@ -81,6 +81,7 @@ output reg dm_access_size;
 
 always @(ALUOp, rsData, rtData)
 begin : EXECUTE
+	if (enable_execute == 1) begin
 	branch_taken = 0;
 	if(insn[31:26] == RTYPE) begin
 		case (ALUOp)
@@ -379,6 +380,6 @@ begin : EXECUTE
 		dataOut = dataOut;
 	end
 end
-//end
+end
 	
 endmodule
