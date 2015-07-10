@@ -481,7 +481,7 @@ begin : DECODE
 					ALUOp = ADDI;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
-					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
+					imm_out_sx[31:0] = { { 16{ insn[15] } }, insn[15:0] };
 				end
 
 				ADDIU: begin
@@ -495,7 +495,7 @@ begin : DECODE
 					ALUOp = ADDIU;
 					rsIn_regfile = rs_out;
 					rdIn_regfile = rt_out;
-					imm_out_sx[31:0] <= { { 16{ insn[15] } }, insn[15:0] };
+					imm_out_sx[31:0] = { { 16{ insn[15] } }, insn[15:0] };
 				end
 
 				SLTI: begin

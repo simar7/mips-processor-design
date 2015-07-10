@@ -297,16 +297,6 @@ initial begin
 	stall_count = 0;
 end
 
-always @(posedge clock) begin
-	if (stall_count == 0) begin
-		stall = 0;
-		//enable = 1;
-	end else begin
-		stall = 1;
-		//enable = 0;
-	end
-end
-
 always 	@(posedge clock) begin: POPULATE
 
 	if (rw == 0) begin
@@ -327,19 +317,11 @@ always 	@(posedge clock) begin: POPULATE
 			address_dm <= 32'h80120000;
 			address <= 32'h80020000;
 			enable_data_write_dm = 1;
-			//enable_fetch <= 1;
-			//stall = 0;
+			enable_fetch = 1;
+			stall = 0;
 		end
 	end
 
-	
-	if (rw == 1 && fetch_not_enabled == 1) begin : ENABLEFETCH
-		//address <= 32'h80020000;
-		//pc_decode <= pc_fetch;
-		enable_fetch <= 1;
-		fetch_not_enabled = 0;
-	end
-	
 
 	if (enable_fetch && (words_fetched <= words_written)) begin : FETCHSTAGE
 		address = pc_fetch;
@@ -348,17 +330,13 @@ always 	@(posedge clock) begin: POPULATE
 		pc_decode = pc_from_fetch_temp;
 		if (stall == 0) begin
 			words_fetched <= words_fetched + 1;
+			//enable_decode <=1;	// too early for decode to be enabled here.
 		end
-		//enable_decode <= 1;
+		if(words_fetched >= 1) begin
+			enable_decode <= 1;
+		end
 	end
 
-	
-	if ((rw_fetch == 1) && (decode_not_enabled == 1)) begin : ENABLEDECODE
-		//address <= 32'h80020000;
-		enable_decode <= 1;
-		decode_not_enabled = 0;
-	end
-	
 
 	if (enable_decode && (words_decoded <= words_written)) begin : DECODESTAGE
 		//pc_decode <= pc_fetch;
@@ -378,15 +356,21 @@ always 	@(posedge clock) begin: POPULATE
 		rtOut_regfile_tb = rtOut_regfile;
 		imm_out_sx_decode_tb = imm_out_sx_decode;
 
-		pc_from_decode_temp <= pc_out;
+		pc_from_decode_temp = pc_from_fetch_temp;
+		insn_execute_temp = insn_decode;
 		//pc_execute = pc_from_decode_temp;
-		insn_execute_temp <= insn_decode;
 		//insn_execute = insn_execute_temp;
 
-		enable_execute <= 1;
+		//enable_execute <= 1;
 
 		if (stall == 0) begin
-			words_decoded <= words_decoded + 1;
+			words_decoded = words_decoded + 1;
+		end
+
+		if (words_decoded >= 1) begin
+			enable_execute = 1;
+			// todo: do we need to enable regfile here?
+			we_regfile = 1;
 		end
 
 		if (opcode_out_tb == 6'b000000 && rs_out_tb == 5'b00000 && rt_out_tb == 5'b00000 && rd_out_tb == 5'b00000 && sa_out_tb == 5'b00000 && func_out_tb == 6'b000000) begin
@@ -701,26 +685,18 @@ always 	@(posedge clock) begin: POPULATE
 			end
 		end	
 
-	
-	
-	if (words_decoded > 0) begin : ENABLEEXECUTE
-		//enable_execute = 1;
-		execute_not_enabled = 0;
-		we_regfile = 1;
-	end
-
-	if (enable_execute == 1 && execute_not_enabled == 0 && words_executed <= words_written + 1) begin : EXECUTESTAGE		
+	if (enable_execute == 1 && words_executed <= words_written + 1) begin : EXECUTESTAGE		
 		dataOut_execute_tb = dataOut_execute;
 		branch_taken_tb = branch_taken_execute;
 
 		pc_execute = pc_from_decode_temp;
-		rsData_execute <= rsOut_regfile;
-		rtData_execute <= rtOut_regfile;
-		saData_execute <= sa_out;
-		imm_execute <= imm_out_sx_decode;
-		ALUOp_execute <= ALUOp_decode;
-		insn_execute <= insn_execute_temp;
-		insn_writeback_temp <= insn_execute;
+		rsData_execute = rsOut_regfile;
+		rtData_execute = rtOut_regfile;
+		saData_execute = sa_out;
+		imm_execute = imm_out_sx_decode;
+		ALUOp_execute = ALUOp_decode;
+		insn_execute = insn_execute_temp;
+		insn_writeback_temp = insn_execute;
 		insn_writeback_temp_2 <= insn_writeback_temp;
 		//dVal_regfile <= dataOut_execute;
 		//we_regfile <= 0;
@@ -769,7 +745,7 @@ always 	@(posedge clock) begin: POPULATE
 		rw_dm = 0;
 		address_dm = dataOut_execute;
 		//data_in_dm = rtData_execute;
-		data_in_dm <= { {26{1'b0}}, insn_writeback_temp_2[20:16]};
+		data_in_dm <= { {26{1'b0}}, insn_writeback_temp[20:16]};
 		//ata_in_dm = insn_writeback_temp[20:16];
 		//rw_d_wb <= 0;
 		we_regfile = 0;

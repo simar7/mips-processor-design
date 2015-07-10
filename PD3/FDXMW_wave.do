@@ -9,6 +9,7 @@ add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/enable
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/enable_fetch
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/enable_decode
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/enable_execute
+add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/pc_fetch
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/pc_decode
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/insn_decode
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/pc_execute
@@ -32,7 +33,6 @@ add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/data_in_alu_wb
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/rw_d_wb
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/busy
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/data_out
-add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/pc_fetch
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/opcode_out
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/rs_out
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/rt_out
@@ -94,7 +94,7 @@ add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/rsOut_regfile_tb
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/rtOut_regfile_tb
 add wave -noupdate -radix hexadecimal /F_D_X_M_W_tb/imm_out_sx_decode_tb
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {69 ps} 0}
+WaveRestoreCursors {{Cursor 1} {29 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 340
 configure wave -valuecolwidth 100
